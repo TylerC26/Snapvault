@@ -196,3 +196,4 @@ Each document in `events/{code}/photos` has:
 ### Delete protection
 
 Add `VITE_DELETE_PASSWORD` to `.env` to enable photo deletion. The host/couple sets this password; only users who enter it can delete photos.
+# Snapvault
