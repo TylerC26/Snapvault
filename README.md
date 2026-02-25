@@ -199,3 +199,4 @@ Add `VITE_DELETE_PASSWORD` to `.env` to enable photo deletion. The host/couple s
 # Snapvault
 # Snapvault
 # Snapvault
+# Snapvault
