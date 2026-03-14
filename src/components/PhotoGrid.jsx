@@ -3,7 +3,7 @@ import PhotoModal from "./PhotoModal";
 import { t, tagLabel } from "../i18n";
 
 export default function PhotoGrid({ photos, onDelete, language }) {
-  const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
   const [failedIds, setFailedIds] = useState(new Set());
 
   const handleImageError = useCallback((photoId) => {
@@ -20,6 +20,17 @@ export default function PhotoGrid({ photos, onDelete, language }) {
   }, [photos]);
 
   const visiblePhotos = photos.filter((p) => !failedIds.has(p.id));
+
+  useEffect(() => {
+    if (selectedIndex < 0) return;
+    if (visiblePhotos.length === 0) {
+      setSelectedIndex(-1);
+      return;
+    }
+    if (selectedIndex >= visiblePhotos.length) {
+      setSelectedIndex(visiblePhotos.length - 1);
+    }
+  }, [selectedIndex, visiblePhotos.length]);
 
   if (!photos?.length) {
     return (
@@ -39,10 +50,10 @@ export default function PhotoGrid({ photos, onDelete, language }) {
           : t(language, "photosSharedMany")}
       </p>
       <div className="columns-2 sm:columns-3 gap-2 sm:gap-3 space-y-2 sm:space-y-3">
-        {visiblePhotos.map((photo) => (
+        {visiblePhotos.map((photo, index) => (
           <button
             key={photo.id}
-            onClick={() => setSelectedPhoto(photo)}
+            onClick={() => setSelectedIndex(index)}
             className="block w-full break-inside-avoid touch-manipulation"
           >
             <div className="relative aspect-square overflow-hidden rounded-xl bg-[#e8f0e8]/50">
@@ -76,8 +87,10 @@ export default function PhotoGrid({ photos, onDelete, language }) {
       </div>
 
       <PhotoModal
-        photo={selectedPhoto}
-        onClose={() => setSelectedPhoto(null)}
+        photos={visiblePhotos}
+        currentIndex={selectedIndex}
+        onClose={() => setSelectedIndex(-1)}
+        onNavigate={setSelectedIndex}
         onDelete={onDelete}
         language={language}
       />

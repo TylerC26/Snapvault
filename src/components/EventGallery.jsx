@@ -274,13 +274,19 @@ export default function EventGallery({ language, setLanguage }) {
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 sm:px-6 py-4 sm:py-6 pb-[max(6rem,calc(1.5rem+env(safe-area-inset-bottom)))]">
+      <main
+        className={
+          showLanding
+            ? "px-4 sm:px-6 py-4 sm:py-6 h-[calc(100svh-6rem)] sm:h-[calc(100svh-6.5rem)] pb-[max(1rem,env(safe-area-inset-bottom))]"
+            : "max-w-2xl mx-auto px-4 sm:px-6 py-4 sm:py-6 pb-[max(6rem,calc(1.5rem+env(safe-area-inset-bottom)))]"
+        }
+      >
         {showLanding && (
-          <section className="py-2">
+          <section className="h-full">
             <button
               type="button"
               onClick={() => setShowLanding(false)}
-              className="relative w-full h-[clamp(380px,72svh,860px)] rounded-2xl overflow-hidden border-2 border-[#e8d9a8] touch-manipulation"
+              className="relative w-full h-full rounded-2xl overflow-hidden border-2 border-[#e8d9a8] touch-manipulation"
             >
               <img
                 src={heroImage}

@@ -1,17 +1,39 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { t, tagLabel } from "../i18n";
 
-export default function PhotoModal({ photo, onClose, onDelete, language }) {
+export default function PhotoModal({ photos, currentIndex, onClose, onNavigate, onDelete, language }) {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState('');
   const [deleteError, setDeleteError] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const touchStartX = useRef(null);
+
+  const hasPhoto = currentIndex >= 0 && currentIndex < photos.length;
+  const photo = hasPhoto ? photos[currentIndex] : null;
+  const hasMultiple = photos.length > 1;
+
+  const goPrev = () => {
+    if (!hasMultiple || currentIndex < 0) return;
+    onNavigate((currentIndex - 1 + photos.length) % photos.length);
+  };
+
+  const goNext = () => {
+    if (!hasMultiple || currentIndex < 0) return;
+    onNavigate((currentIndex + 1) % photos.length);
+  };
 
   useEffect(() => {
-    const handler = (e) => e.key === 'Escape' && (showPassword ? setShowPassword(false) : onClose());
+    const handler = (e) => {
+      if (e.key === "Escape") {
+        showPassword ? setShowPassword(false) : onClose();
+      }
+      if (showPassword) return;
+      if (e.key === "ArrowLeft") goPrev();
+      if (e.key === "ArrowRight") goNext();
+    };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [onClose, showPassword]);
+  }, [onClose, showPassword, currentIndex, photos.length]);
 
   useEffect(() => {
     if (!showPassword) {
@@ -55,13 +77,45 @@ export default function PhotoModal({ photo, onClose, onDelete, language }) {
       <div
         className="max-w-full max-h-[85vh] flex flex-col items-center"
         onClick={(e) => e.stopPropagation()}
+        onTouchStart={(e) => {
+          touchStartX.current = e.changedTouches[0].clientX;
+        }}
+        onTouchEnd={(e) => {
+          if (touchStartX.current == null || showPassword || !hasMultiple) return;
+          const delta = e.changedTouches[0].clientX - touchStartX.current;
+          if (Math.abs(delta) > 40) {
+            if (delta < 0) goNext();
+            if (delta > 0) goPrev();
+          }
+          touchStartX.current = null;
+        }}
       >
+        {hasMultiple && (
+          <button
+            type="button"
+            onClick={goPrev}
+            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 text-white text-xl hover:bg-black/60"
+            aria-label="Previous photo"
+          >
+            ‹
+          </button>
+        )}
         <img
           src={photo.url}
           alt={photo.caption || t(language, "weddingPhoto")}
           className="max-w-full max-h-[70vh] sm:max-h-[75vh] object-contain rounded-lg"
           onError={onClose}
         />
+        {hasMultiple && (
+          <button
+            type="button"
+            onClick={goNext}
+            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 text-white text-xl hover:bg-black/60"
+            aria-label="Next photo"
+          >
+            ›
+          </button>
+        )}
         {photo.tags?.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-2 justify-center">
             {photo.tags.map((tag) => (
