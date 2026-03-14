@@ -16,6 +16,10 @@
   font-family: 'Playfair Display', Georgia, serif;
 }
 
+.font-fancy {
+  font-family: "Cormorant Garamond", "Times New Roman", serif;
+}
+
 /* Safe area insets for notched devices (iPhone X+, etc.) */
 .safe-area-top {
   padding-top: env(safe-area-inset-top, 0);

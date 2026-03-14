@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
+import { t, tagLabel } from "../i18n";
 
-export default function PhotoModal({ photo, onClose, onDelete }) {
+export default function PhotoModal({ photo, onClose, onDelete, language }) {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState('');
   const [deleteError, setDeleteError] = useState(null);
@@ -33,7 +34,7 @@ export default function PhotoModal({ photo, onClose, onDelete }) {
     if (result.success) {
       onClose();
     } else {
-      setDeleteError(result.error || 'Delete failed');
+      setDeleteError(result.error || t(language, "deleteFailed"));
     }
   };
 
@@ -57,7 +58,7 @@ export default function PhotoModal({ photo, onClose, onDelete }) {
       >
         <img
           src={photo.url}
-          alt={photo.caption || 'Wedding photo'}
+          alt={photo.caption || t(language, "weddingPhoto")}
           className="max-w-full max-h-[70vh] sm:max-h-[75vh] object-contain rounded-lg"
           onError={onClose}
         />
@@ -68,19 +69,14 @@ export default function PhotoModal({ photo, onClose, onDelete }) {
                 key={tag}
                 className="text-xs px-3 py-1 rounded-full bg-white/20 text-white font-medium"
               >
-                {tag}
+                {tagLabel(language, tag)}
               </span>
             ))}
           </div>
         )}
         {photo.guestName && (
           <p className="mt-2 text-white/70 text-center text-sm">
-            Shared by {photo.guestName}
-          </p>
-        )}
-        {photo.caption && (
-          <p className="mt-4 text-white/90 text-center max-w-md font-medium">
-            {photo.caption}
+            {t(language, "sharedBy", { name: photo.guestName })}
           </p>
         )}
         {onDelete && (
@@ -89,7 +85,7 @@ export default function PhotoModal({ photo, onClose, onDelete }) {
             onClick={handleDeleteClick}
             className="mt-4 px-4 py-2 rounded-lg border border-red-400/60 text-red-300 hover:bg-red-500/20 text-sm font-medium touch-manipulation"
           >
-            Delete photo
+            {t(language, "deletePhoto")}
           </button>
         )}
       </div>
@@ -103,12 +99,12 @@ export default function PhotoModal({ photo, onClose, onDelete }) {
             className="bg-[#2a2a2a] rounded-2xl p-6 max-w-sm w-full shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="text-white font-medium mb-2">Enter password to delete</p>
+            <p className="text-white font-medium mb-2">{t(language, "enterPasswordToDelete")}</p>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
+              placeholder={t(language, "password")}
               className="w-full px-4 py-3 rounded-xl bg-[#1a1a1a] border border-[#444] text-white placeholder-[#888] focus:border-[#c9a227] outline-none text-base mb-3"
               autoFocus
               onKeyDown={(e) => e.key === 'Enter' && handleDeleteConfirm()}
@@ -122,7 +118,7 @@ export default function PhotoModal({ photo, onClose, onDelete }) {
                 onClick={() => setShowPassword(false)}
                 className="flex-1 py-2.5 rounded-xl border border-[#555] text-white/90 font-medium touch-manipulation"
               >
-                Cancel
+                {t(language, "cancel")}
               </button>
               <button
                 type="button"
@@ -130,7 +126,7 @@ export default function PhotoModal({ photo, onClose, onDelete }) {
                 disabled={deleting || !password}
                 className="flex-1 py-2.5 rounded-xl bg-red-600 text-white font-medium hover:bg-red-500 disabled:opacity-50 touch-manipulation"
               >
-                {deleting ? 'Deleting…' : 'Delete'}
+                {deleting ? t(language, "deleting") : t(language, "delete")}
               </button>
             </div>
           </div>

@@ -1,7 +1,8 @@
-import { useState, useCallback, useEffect } from 'react';
-import PhotoModal from './PhotoModal';
+import { useState, useCallback, useEffect } from "react";
+import PhotoModal from "./PhotoModal";
+import { t, tagLabel } from "../i18n";
 
-export default function PhotoGrid({ photos, onDelete }) {
+export default function PhotoGrid({ photos, onDelete, language }) {
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [failedIds, setFailedIds] = useState(new Set());
 
@@ -23,8 +24,8 @@ export default function PhotoGrid({ photos, onDelete }) {
   if (!photos?.length) {
     return (
       <div className="text-center py-16 text-[#8a8a8a]">
-        <p className="text-lg font-medium">No photos yet</p>
-        <p className="text-sm mt-1">Be the first to share memories!</p>
+        <p className="text-lg font-medium">{t(language, "noPhotosYet")}</p>
+        <p className="text-sm mt-1">{t(language, "beFirst")}</p>
       </div>
     );
   }
@@ -32,7 +33,10 @@ export default function PhotoGrid({ photos, onDelete }) {
   return (
     <>
       <p className="text-[#8a8a8a] text-sm mb-4">
-        {visiblePhotos.length} {visiblePhotos.length === 1 ? 'photo' : 'photos'} shared
+        {visiblePhotos.length}{" "}
+        {visiblePhotos.length === 1
+          ? t(language, "photoSharedOne")
+          : t(language, "photosSharedMany")}
       </p>
       <div className="columns-2 sm:columns-3 gap-2 sm:gap-3 space-y-2 sm:space-y-3">
         {visiblePhotos.map((photo) => (
@@ -44,7 +48,7 @@ export default function PhotoGrid({ photos, onDelete }) {
             <div className="relative aspect-square overflow-hidden rounded-xl bg-[#e8f0e8]/50">
               <img
                 src={photo.url}
-                alt={photo.caption || 'Wedding photo'}
+                alt={photo.caption || t(language, "weddingPhoto")}
                 className="w-full h-full object-cover"
                 loading="lazy"
                 onError={() => handleImageError(photo.id)}
@@ -57,7 +61,7 @@ export default function PhotoGrid({ photos, onDelete }) {
                         key={tag}
                         className="text-[10px] px-2 py-0.5 rounded-full bg-white/90 text-[#4a4a4a] font-medium"
                       >
-                        {tag}
+                        {tagLabel(language, tag)}
                       </span>
                     ))}
                     {photo.tags.length > 2 && (
@@ -75,6 +79,7 @@ export default function PhotoGrid({ photos, onDelete }) {
         photo={selectedPhoto}
         onClose={() => setSelectedPhoto(null)}
         onDelete={onDelete}
+        language={language}
       />
     </>
   );
