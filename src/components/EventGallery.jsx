@@ -1,16 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import {
-  collection,
-  query,
-  orderBy,
-  onSnapshot,
-  doc,
-  addDoc,
-  deleteDoc,
-  setDoc,
-  serverTimestamp,
-} from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot, doc, deleteDoc } from "firebase/firestore";
 import { ref, deleteObject } from "firebase/storage";
 import { db, storage, signInAnon } from "../firebase";
 import PhotoUpload from "./PhotoUpload";
@@ -22,6 +12,7 @@ import { t, tagLabel } from "../i18n";
 const EVENT_TITLES = {
   CONNIEMAN: "Connie & Man's Wedding",
 };
+
 const EVENT_HERO_IMAGES = {
   CONNIEMAN: "/connieman-hero.png",
 };
@@ -36,10 +27,6 @@ function getStoragePathFromUrl(url) {
   }
 }
 
-function normalizeTagKey(name) {
-  return name.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-}
-
 export default function EventGallery({ language, setLanguage }) {
   const { code } = useParams();
   const [photos, setPhotos] = useState([]);
@@ -47,52 +34,22 @@ export default function EventGallery({ language, setLanguage }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filterTag, setFilterTag] = useState(null);
-  const [viewMode, setViewMode] = useState(null); // null | upload | album | message
   const [showLanding, setShowLanding] = useState(true);
-  const [messageName, setMessageName] = useState("");
-  const [messageBody, setMessageBody] = useState("");
-  const [sendingMessage, setSendingMessage] = useState(false);
-  const [messageStatus, setMessageStatus] = useState({ type: "", text: "" });
 
   const availableTags = useMemo(() => {
     const seen = new Set();
-    const merged = [...PHOTO_TAGS, ...customTags].filter((tag) => {
+    return [...PHOTO_TAGS, ...customTags].filter((tag) => {
       const key = tag.trim().toLowerCase();
       if (!key || seen.has(key)) return false;
       seen.add(key);
       return true;
     });
-    return merged;
   }, [customTags]);
 
   const filteredPhotos = useMemo(() => {
     if (!filterTag) return photos;
     return photos.filter((p) => p.tags?.includes(filterTag));
   }, [photos, filterTag]);
-
-  const handleCreateTag = useCallback(
-    async (tagName) => {
-      const name = tagName.trim();
-      if (!name) return { success: false, error: t(language, "tagRequired") };
-      const exists = availableTags.some((tag) => tag.toLowerCase() === name.toLowerCase());
-      if (exists) return { success: false, error: t(language, "tagExists") };
-      try {
-        await signInAnon();
-        const key = normalizeTagKey(name);
-        if (!key) return { success: false, error: t(language, "createTagFailed") };
-        await setDoc(
-          doc(db, "events", code.toUpperCase(), "tags", key),
-          { name, createdAt: serverTimestamp() },
-          { merge: true }
-        );
-        return { success: true, tag: name };
-      } catch (err) {
-        console.error(err);
-        return { success: false, error: t(language, "createTagFailed") };
-      }
-    },
-    [availableTags, code, language]
-  );
 
   const handleDelete = useCallback(
     async (photo, password) => {
@@ -120,37 +77,6 @@ export default function EventGallery({ language, setLanguage }) {
     [code, language]
   );
 
-  const handleSendMessage = useCallback(async () => {
-    const trimmedName = messageName.trim();
-    const trimmedMessage = messageBody.trim();
-    if (!trimmedName) {
-      setMessageStatus({ type: "error", text: t(language, "nameRequired") });
-      return;
-    }
-    if (!trimmedMessage) {
-      setMessageStatus({ type: "error", text: t(language, "messageRequired") });
-      return;
-    }
-    setSendingMessage(true);
-    setMessageStatus({ type: "", text: "" });
-    try {
-      await signInAnon();
-      await addDoc(collection(db, "events", code.toUpperCase(), "messages"), {
-        name: trimmedName,
-        message: trimmedMessage,
-        timestamp: serverTimestamp(),
-      });
-      setMessageName("");
-      setMessageBody("");
-      setMessageStatus({ type: "success", text: t(language, "messageSent") });
-    } catch (err) {
-      console.error(err);
-      setMessageStatus({ type: "error", text: t(language, "connectError") });
-    } finally {
-      setSendingMessage(false);
-    }
-  }, [code, language, messageBody, messageName]);
-
   useEffect(() => {
     if (!code) return;
 
@@ -161,18 +87,18 @@ export default function EventGallery({ language, setLanguage }) {
       .then(() => {
         if (cancelled) return;
         const q = query(
-          collection(db, 'events', code.toUpperCase(), 'photos'),
-          orderBy('timestamp', 'desc')
+          collection(db, "events", code.toUpperCase(), "photos"),
+          orderBy("timestamp", "desc")
         );
 
         unsubscribe = onSnapshot(
           q,
           (snapshot) => {
             if (cancelled) return;
-            const items = snapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
-              timestamp: doc.data().timestamp?.toDate?.()?.getTime() ?? 0,
+            const items = snapshot.docs.map((d) => ({
+              id: d.id,
+              ...d.data(),
+              timestamp: d.data().timestamp?.toDate?.()?.getTime() ?? 0,
             }));
             setPhotos(items);
             setLoading(false);
@@ -214,6 +140,7 @@ export default function EventGallery({ language, setLanguage }) {
           collection(db, "events", code.toUpperCase(), "tags"),
           orderBy("createdAt", "asc")
         );
+
         unsubscribe = onSnapshot(
           tagsQuery,
           (snapshot) => {
@@ -239,18 +166,19 @@ export default function EventGallery({ language, setLanguage }) {
 
   useEffect(() => {
     setShowLanding(true);
-    setViewMode(null);
+    setFilterTag(null);
   }, [code]);
 
   if (!code) return null;
 
   const displayCode = code.toUpperCase();
   const navTitle = EVENT_TITLES[displayCode] || t(language, "appTitle");
-  const heroImage = EVENT_HERO_IMAGES[displayCode]
-    || "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1400&q=80";
-  const goToEventMainMenu = () => {
+  const heroImage =
+    EVENT_HERO_IMAGES[displayCode] ||
+    "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1400&q=80";
+
+  const goToHeroPage = () => {
     setShowLanding(true);
-    setViewMode(null);
     setFilterTag(null);
   };
 
@@ -260,7 +188,7 @@ export default function EventGallery({ language, setLanguage }) {
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
           <button
             type="button"
-            onClick={goToEventMainMenu}
+            onClick={goToHeroPage}
             className="min-h-[44px] min-w-[44px] flex items-center justify-center -m-2 text-[#8a8a8a] text-sm hover:text-[#4a4a4a] touch-manipulation"
           >
             ← {t(language, "back")}
@@ -288,11 +216,7 @@ export default function EventGallery({ language, setLanguage }) {
               onClick={() => setShowLanding(false)}
               className="relative w-full h-full rounded-2xl overflow-hidden border-2 border-[#e8d9a8] touch-manipulation"
             >
-              <img
-                src={heroImage}
-                alt={navTitle}
-                className="w-full h-full object-cover"
-              />
+              <img src={heroImage} alt={navTitle} className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-black/40" />
               <div className="absolute inset-0 flex items-end justify-center p-6 sm:p-8">
                 <h2 className="font-fancy text-4xl sm:text-5xl text-white text-center drop-shadow-lg">
@@ -309,142 +233,8 @@ export default function EventGallery({ language, setLanguage }) {
               {t(language, "appSubtitle")}
             </h2>
 
-            {!viewMode && (
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 gap-4">
-              <button
-                type="button"
-                onClick={() => setViewMode("upload")}
-                className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden border-2 border-[#e8d9a8] hover:border-[#c9a227] touch-manipulation transition bg-cover bg-center"
-                style={{
-                  backgroundImage:
-                    "url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=80')",
-                }}
-              >
-                <div className="absolute inset-0 bg-black/40" />
-                <div className="absolute inset-0 flex items-center justify-center text-center px-4">
-                  <span className="font-fancy text-5xl sm:text-6xl leading-none text-white drop-shadow-lg tracking-wide">
-                    {t(language, "photoUpload")}
-                  </span>
-                </div>
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode("album")}
-                className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden border-2 border-[#e8d9a8] hover:border-[#c9a227] touch-manipulation transition bg-cover bg-center"
-                style={{
-                  backgroundImage:
-                    "url('https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=80')",
-                }}
-              >
-                <div className="absolute inset-0 bg-black/40" />
-                <div className="absolute inset-0 flex items-center justify-center text-center px-4">
-                  <span className="font-fancy text-5xl sm:text-6xl leading-none text-white drop-shadow-lg tracking-wide">
-                    {t(language, "album")}
-                  </span>
-                </div>
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode("message")}
-                className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden border-2 border-[#e8d9a8] hover:border-[#c9a227] touch-manipulation transition bg-cover bg-center"
-                style={{
-                  backgroundImage:
-                    "url('https://images.unsplash.com/photo-1516589091380-5d8e87df6999?auto=format&fit=crop&w=1400&q=80')",
-                }}
-              >
-                <div className="absolute inset-0 bg-black/40" />
-                <div className="absolute inset-0 flex items-center justify-center text-center px-4">
-                  <span className="font-fancy text-5xl sm:text-6xl leading-none text-white drop-shadow-lg tracking-wide">
-                    {t(language, "leaveMessage")}
-                  </span>
-                </div>
-              </button>
-                </div>
-              </div>
-            )}
-
-            {viewMode === "upload" && (
-              <>
-            <div className="mb-4 flex items-center">
-              <button
-                type="button"
-                onClick={() => setViewMode(null)}
-                className="text-sm text-[#8a8a8a] hover:text-[#4a4a4a] underline"
-              >
-                {t(language, "backToMenu")}
-              </button>
-            </div>
             <div className="mb-8">
-              <PhotoUpload
-                eventCode={displayCode}
-                language={language}
-                availableTags={availableTags}
-              />
-            </div>
-              </>
-            )}
-
-            {viewMode === "message" && (
-              <>
-            <div className="mb-4 flex items-center">
-              <button
-                type="button"
-                onClick={() => setViewMode(null)}
-                className="text-sm text-[#8a8a8a] hover:text-[#4a4a4a] underline"
-              >
-                {t(language, "backToMenu")}
-              </button>
-            </div>
-            <div className="rounded-2xl border border-[#e8d9a8] bg-white/80 p-4 space-y-4">
-              <h3 className="font-display text-2xl text-[#4a4a4a]">
-                {t(language, "leaveMessageTitle")}
-              </h3>
-              <input
-                type="text"
-                value={messageName}
-                onChange={(e) => setMessageName(e.target.value)}
-                placeholder={t(language, "senderNameOptional")}
-                className="w-full min-h-[48px] px-4 py-3 rounded-xl border border-[#e8d9a8] bg-white focus:border-[#c9a227] focus:ring-1 focus:ring-[#c9a227] outline-none text-base"
-              />
-              <textarea
-                value={messageBody}
-                onChange={(e) => setMessageBody(e.target.value)}
-                placeholder={t(language, "messagePlaceholder")}
-                rows={5}
-                className="w-full px-4 py-3 rounded-xl border border-[#e8d9a8] bg-white focus:border-[#c9a227] focus:ring-1 focus:ring-[#c9a227] outline-none text-base resize-y"
-              />
-              {messageStatus.text && (
-                <p
-                  className={`text-sm font-medium ${
-                    messageStatus.type === "error" ? "text-red-600" : "text-green-700"
-                  }`}
-                >
-                  {messageStatus.text}
-                </p>
-              )}
-              <button
-                type="button"
-                onClick={handleSendMessage}
-                disabled={sendingMessage}
-                className="w-full min-h-[52px] rounded-xl bg-[#c9a227] text-white font-semibold text-base hover:bg-[#b8911f] active:scale-[0.98] transition touch-manipulation disabled:opacity-60"
-              >
-                {sendingMessage ? t(language, "sending") : t(language, "sendMessage")}
-              </button>
-            </div>
-              </>
-            )}
-
-            {viewMode === "album" && (
-              <>
-            <div className="mb-4 flex items-center">
-              <button
-                type="button"
-                onClick={() => setViewMode(null)}
-                className="text-sm text-[#8a8a8a] hover:text-[#4a4a4a] underline"
-              >
-                {t(language, "backToMenu")}
-              </button>
+              <PhotoUpload eventCode={displayCode} language={language} availableTags={availableTags} />
             </div>
 
             {!loading && photos.length > 0 && (
@@ -455,8 +245,8 @@ export default function EventGallery({ language, setLanguage }) {
                     onClick={() => setFilterTag(null)}
                     className={`min-h-[44px] shrink-0 px-4 py-2.5 rounded-full text-sm font-medium transition touch-manipulation ${
                       !filterTag
-                        ? 'bg-[#c9a227] text-white'
-                        : 'bg-white border border-[#e8d9a8] text-[#4a4a4a] hover:border-[#c9a227]'
+                        ? "bg-[#c9a227] text-white"
+                        : "bg-white border border-[#e8d9a8] text-[#4a4a4a] hover:border-[#c9a227]"
                     }`}
                   >
                     {t(language, "all")}
@@ -470,8 +260,8 @@ export default function EventGallery({ language, setLanguage }) {
                         onClick={() => setFilterTag(tag)}
                         className={`min-h-[44px] shrink-0 px-4 py-2.5 rounded-full text-sm font-medium transition touch-manipulation ${
                           filterTag === tag
-                            ? 'bg-[#c9a227] text-white'
-                            : 'bg-white border border-[#e8d9a8] text-[#4a4a4a] hover:border-[#c9a227]'
+                            ? "bg-[#c9a227] text-white"
+                            : "bg-white border border-[#e8d9a8] text-[#4a4a4a] hover:border-[#c9a227]"
                         }`}
                       >
                         {tagLabel(language, tag)} ({count})
@@ -494,16 +284,6 @@ export default function EventGallery({ language, setLanguage }) {
               </div>
             ) : (
               <PhotoGrid photos={filteredPhotos} onDelete={handleDelete} language={language} />
-            )}
-
-            <button
-              type="button"
-              onClick={() => setViewMode("upload")}
-              className="w-full mt-4 min-h-[52px] rounded-xl bg-[#c9a227] text-white font-semibold text-base hover:bg-[#b8911f] active:scale-[0.98] transition touch-manipulation"
-            >
-              {t(language, "openUpload")}
-            </button>
-              </>
             )}
           </>
         )}
