@@ -14,7 +14,7 @@ const EVENT_TITLES = {
 };
 
 const EVENT_HERO_IMAGES = {
-  CONNIEMAN: "/connieman-hero.png",
+  CONNIEMAN: "/connieman-hero-v2.png",
 };
 
 /** Extract Storage path from Firebase download URL (for photos without storagePath) */
@@ -210,23 +210,14 @@ export default function EventGallery({ language, setLanguage }) {
         }
       >
         {showLanding && (
-          <section className="h-full">
+          <section className="h-full flex items-center justify-center">
             <button
               type="button"
               onClick={() => setShowLanding(false)}
-              className="relative w-full h-full rounded-2xl overflow-hidden border-2 border-[#e8d9a8] touch-manipulation"
+              className="relative h-full max-h-full max-w-full aspect-[691/1024] rounded-2xl overflow-hidden border-2 border-[#e8d9a8] touch-manipulation"
             >
               <img src={heroImage} alt={navTitle} className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-black/40" />
-              <div className="absolute inset-0 flex items-end justify-center p-6 sm:p-8">
-                <h2 className="font-fancy text-4xl sm:text-5xl text-white text-center drop-shadow-lg">
-                  {t(language, "eventWelcome", { event: navTitle })}
-                </h2>
-              </div>
             </button>
-            <p className="mt-3 text-center text-sm text-[#8a8a8a]">
-              Click anywhere to proceed
-            </p>
           </section>
         )}
 
