@@ -381,13 +381,6 @@ export default function EventGallery({ language, setLanguage }) {
                 language={language}
                 availableTags={availableTags}
               />
-              <button
-                type="button"
-                onClick={() => setViewMode("album")}
-                className="w-full mt-4 min-h-[52px] rounded-xl bg-[#c9a227] text-white font-semibold text-base hover:bg-[#b8911f] active:scale-[0.98] transition touch-manipulation"
-              >
-                {t(language, "openAlbum")}
-              </button>
             </div>
               </>
             )}
