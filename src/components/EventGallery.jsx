@@ -224,6 +224,9 @@ export default function EventGallery({ language, setLanguage }) {
                 </h2>
               </div>
             </button>
+            <p className="mt-3 text-center text-sm text-[#8a8a8a]">
+              Click anywhere to proceed
+            </p>
           </section>
         )}
 
