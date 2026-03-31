@@ -1,29 +1,41 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore";
+import { db, signInAnon } from "../firebase";
 import LanguageToggle from "./LanguageToggle";
 import { t } from "../i18n";
-
-// Valid event codes - in production, these would come from Firestore or your backend
-const VALID_CODES = ["TESTWEDDING", "CONNIEMAN"];
 
 export default function EventCodeEntry({ language, setLanguage }) {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const trimmed = code.trim().toUpperCase();
     if (!trimmed) {
       setError(t(language, "requiredCode"));
       return;
     }
-    if (!VALID_CODES.includes(trimmed)) {
-      setError(t(language, "invalidCode"));
-      return;
-    }
+
+    setLoading(true);
     setError("");
-    navigate(`/event/${trimmed}`);
+
+    try {
+      await signInAnon();
+      const eventDoc = await getDoc(doc(db, "events", trimmed));
+      if (!eventDoc.exists() || eventDoc.data()?.active === false) {
+        setError(t(language, "invalidCode"));
+        return;
+      }
+      navigate(`/event/${trimmed}`);
+    } catch (err) {
+      console.error(err);
+      setError(t(language, "connectError"));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -61,17 +73,12 @@ export default function EventCodeEntry({ language, setLanguage }) {
           )}
           <button
             type="submit"
-            className="w-full min-h-[48px] py-4 rounded-xl bg-[#c9a227] text-white font-semibold text-lg shadow-md hover:bg-[#b8911f] active:scale-[0.98] transition touch-manipulation"
+            disabled={loading}
+            className="w-full min-h-[48px] py-4 rounded-xl bg-[#c9a227] text-white font-semibold text-lg shadow-md hover:bg-[#b8911f] active:scale-[0.98] transition touch-manipulation disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {t(language, "enter")}
+            {loading ? t(language, "loading") : t(language, "enter")}
           </button>
         </form>
-
-        <p className="mt-6 text-center text-xs text-[#8a8a8a]">
-          {t(language, "validCodes")}:{" "}
-          <span className="font-mono font-medium text-[#4a4a4a]">TESTWEDDING</span>,{" "}
-          <span className="font-mono font-medium text-[#4a4a4a]">CONNIEMAN</span>
-        </p>
       </div>
     </div>
   );

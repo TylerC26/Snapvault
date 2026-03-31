@@ -11,11 +11,21 @@
  *
  * SECURITY RULES (set these manually in Firebase Console after setup):
  *
- * Firestore rules - restrict to event paths:
+ * Firestore rules:
  *   rules_version = '2';
  *   service cloud.firestore {
  *     match /databases/{database}/documents {
+ *       // Allow authenticated users to read event metadata (code validation + hero image/title)
+ *       match /events/{eventCode} {
+ *         allow read: if request.auth != null;
+ *         allow write: if false; // Only writable via Admin SDK / Firebase Console
+ *       }
+ *       // Photos subcollection - full read/write for authenticated users
  *       match /events/{eventCode}/photos/{photoId} {
+ *         allow read, write: if request.auth != null;
+ *       }
+ *       // Tags subcollection - full read/write for authenticated users
+ *       match /events/{eventCode}/tags/{tagId} {
  *         allow read, write: if request.auth != null;
  *       }
  *     }

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { collection, query, orderBy, onSnapshot, doc, deleteDoc } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot, doc, getDoc, deleteDoc } from "firebase/firestore";
 import { ref, deleteObject } from "firebase/storage";
 import { db, storage, signInAnon } from "../firebase";
 import PhotoUpload from "./PhotoUpload";
@@ -9,13 +9,8 @@ import LanguageToggle from "./LanguageToggle";
 import { PHOTO_TAGS } from "../constants/tags";
 import { t, tagLabel } from "../i18n";
 
-const EVENT_TITLES = {
-  CONNIEMAN: "Connie & Man's Wedding",
-};
-
-const EVENT_HERO_IMAGES = {
-  CONNIEMAN: "/connieman-hero-v2.png",
-};
+const DEFAULT_HERO_IMAGE =
+  "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1400&q=80";
 
 /** Extract Storage path from Firebase download URL (for photos without storagePath) */
 function getStoragePathFromUrl(url) {
@@ -35,6 +30,7 @@ export default function EventGallery({ language, setLanguage }) {
   const [error, setError] = useState(null);
   const [filterTag, setFilterTag] = useState(null);
   const [showLanding, setShowLanding] = useState(true);
+  const [eventData, setEventData] = useState({ title: null, heroImage: null });
 
   const availableTags = useMemo(() => {
     const seen = new Set();
@@ -169,13 +165,29 @@ export default function EventGallery({ language, setLanguage }) {
     setFilterTag(null);
   }, [code]);
 
+  // Fetch event metadata (title, heroImage) from Firestore
+  useEffect(() => {
+    if (!code) return;
+    const displayCode = code.toUpperCase();
+    signInAnon()
+      .then(() => getDoc(doc(db, "events", displayCode)))
+      .then((snap) => {
+        if (snap.exists()) {
+          const data = snap.data();
+          setEventData({
+            title: data.title || null,
+            heroImage: data.heroImage || null,
+          });
+        }
+      })
+      .catch((err) => console.error("Failed to load event metadata:", err));
+  }, [code]);
+
   if (!code) return null;
 
   const displayCode = code.toUpperCase();
-  const navTitle = EVENT_TITLES[displayCode] || t(language, "appTitle");
-  const heroImage =
-    EVENT_HERO_IMAGES[displayCode] ||
-    "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1400&q=80";
+  const navTitle = eventData.title || t(language, "appTitle");
+  const heroImage = eventData.heroImage || DEFAULT_HERO_IMAGE;
 
   const goToHeroPage = () => {
     setShowLanding(true);

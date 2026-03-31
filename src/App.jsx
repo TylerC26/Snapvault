@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import EventCodeEntry from "./components/EventCodeEntry";
 import EventGallery from "./components/EventGallery";
+import MarketingLandingPage from "./components/MarketingLandingPage";
 
 export default function App() {
   const [language, setLanguage] = useState(
@@ -17,6 +18,10 @@ export default function App() {
       <Routes>
         <Route
           path="/"
+          element={<MarketingLandingPage language={language} setLanguage={setLanguage} />}
+        />
+        <Route
+          path="/enter"
           element={<EventCodeEntry language={language} setLanguage={setLanguage} />}
         />
         <Route
