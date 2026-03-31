@@ -41,6 +41,30 @@
   display: none;
 }
 
+/* Marketing landing page fonts */
+.font-headline {
+  font-family: 'Noto Serif', Georgia, serif;
+}
+.font-manrope {
+  font-family: 'Manrope', system-ui, sans-serif;
+}
+.silk-gradient {
+  background: linear-gradient(135deg, #775a19 0%, #d4ad65 100%);
+}
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  display: inline-block;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+}
+
 /* Custom wedding palette */
 :root {
   --wedding-cream: #faf8f5;

@@ -2,184 +2,184 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LanguageToggle from "./LanguageToggle";
 
+function Icon({ name, className = "" }) {
+  return <span className={`material-symbols-outlined ${className}`}>{name}</span>;
+}
+
 const COPY = {
   en: {
-    nav: { howItWorks: "How it works", features: "Features", pricing: "Pricing", haveCode: "I have a code →" },
+    nav: {
+      howItWorks: "How it works",
+      features: "Features",
+      pricing: "Pricing",
+      enterCode: "Enter Event Code",
+    },
     hero: {
-      headline: "Every guest. Every moment. One gallery.",
-      sub: "SnapVault gives your wedding its own private photo gallery — no app needed. Guests just enter a code and start sharing in seconds.",
-      cta: "Get started",
-      haveCode: "I already have a code",
+      headline1: "Preserve Every",
+      headline2: "Candid Moment.",
+      sub: "The digital heirloom for your wedding day. A private, elegant gallery where every guest becomes a storyteller. Collect memories in real-time without the noise of social media.",
+      cta: "Get Started",
+      haveCode: "Have a Code?",
+      stat1Value: "10,000+", stat1Label: "Photos Shared",
+      stat2Value: "500+",   stat2Label: "Happy Couples",
+      stat3Value: "99.9%",  stat3Label: "Uptime",
     },
     how: {
-      title: "How it works",
+      title: "The Seamless Experience",
       steps: [
-        { icon: "✉️", title: "You get a unique code", body: "We create a private event gallery and give you a short code to share on your invitation or wedding program." },
-        { icon: "📸", title: "Guests upload from any phone", body: "No sign-up, no app download. Guests enter the code, tap, and share their photos — it takes seconds." },
-        { icon: "🖼️", title: "One live gallery for everyone", body: "Every photo appears in real-time for the whole group. Tag moments, browse memories, and relive the day." },
+        { icon: "qr_code_2",    title: "1. Get Your Code",     body: "Create your vault and get a unique QR code for your event. Print it on place cards or display it at the venue." },
+        { icon: "add_a_photo",  title: "2. Guests Upload",     body: "Guests simply scan and snap. No app download required. Photos flow instantly into your private vault." },
+        { icon: "photo_library",title: "3. View Your Gallery", body: "Relive the magic as it happens. Curate your digital heirloom and download high-resolution memories forever." },
       ],
     },
     features: {
-      title: "Everything you need, nothing you don't",
+      eyebrow: "Excellence in every pixel",
+      title: "Curated for Quality",
+      sub: "Built specifically for the high demands of luxury weddings, ensuring privacy, speed, and elegance.",
       items: [
-        { icon: "📲", title: "No app required", body: "Works on any smartphone browser. Guests just open the link and go." },
-        { icon: "⚡", title: "Real-time gallery", body: "Photos appear live as guests upload. No refresh needed." },
-        { icon: "🏷️", title: "Tag & filter", body: "Organise memories by Ceremony, Reception, Family, and more." },
-        { icon: "🌐", title: "Bilingual", body: "Full English and Traditional Chinese support — perfect for multicultural weddings." },
-        { icon: "🔒", title: "Secure management", body: "Password-protected photo deletion so only you control your gallery." },
-        { icon: "🗜️", title: "Auto compression", body: "Photos are compressed on device before upload — fast and storage-efficient." },
+        { icon: "devices",           title: "No App Required",       body: "Browser-based experience works on any smartphone instantly. No friction for your guests.",                                                         wide: true },
+        { icon: "bolt",              title: "Real-time Updates",     body: "Photos appear in the gallery within seconds of being taken.",                                                                                       highlight: true },
+        { icon: "sell",              title: "Tagging & Filtering",   body: "Organize photos by moments: Ceremony, Dinner, or Party." },
+        { icon: "translate",         title: "Bilingual Support",     body: "Perfect for international weddings with EN/TC support." },
+        { icon: "admin_panel_settings", title: "Admin Deletion",    body: "Full control over your gallery. Remove unwanted photos instantly." },
+        { icon: "compress",          title: "Smart Auto Compression", body: "High-quality visuals that load instantly on any connection speed without eating up guest data.", fullWidth: true },
       ],
     },
     pricing: {
-      title: "Simple, transparent pricing",
-      sub: "One event. One flat fee. No subscriptions.",
+      title: "Tailored for Your Celebration",
+      sub: "Choose the perfect plan for your special day.",
+      mostPopular: "Most Popular",
       plans: [
         {
-          name: "Free",
-          price: "HK$0",
-          period: "forever",
-          highlight: false,
-          description: "Try it out before your big day.",
-          features: ["1 test event", "Up to 50 photos", "Real-time gallery", "Tag & filter", "Bilingual support"],
-          cta: "Try for free",
-          ctaAction: "try",
+          name: "Memories", price: "HK$0", period: "/ Event", highlight: false,
+          features: ["100 Photo Limit", "24 Hour Access", "Standard Resolution"],
+          cta: "Start Free", ctaAction: "try",
         },
         {
-          name: "Essential",
-          price: "HK$480",
-          period: "per event",
-          highlight: true,
-          description: "Everything you need for your wedding day.",
-          features: ["1 event, unlimited guests", "Unlimited photos", "Custom hero image", "Tag & filter", "Password-protected admin", "Priority setup support"],
-          cta: "Book now",
-          ctaAction: "book",
+          name: "Heirloom", price: "HK$480", period: "/ Event", highlight: true,
+          features: ["Unlimited Photos", "Full Event Duration", "High-Res Downloads", "Live Slideshow Feature"],
+          cta: "Select Plan", ctaAction: "book",
         },
         {
-          name: "Premium",
-          price: "HK$880",
-          period: "per event",
-          highlight: false,
-          description: "White-glove experience for your special day.",
-          features: ["Everything in Essential", "Custom event code (e.g. YOURNAMES)", "Gallery download for couple", "Dedicated WhatsApp support", "Post-event archive (6 months)"],
-          cta: "Contact us",
-          ctaAction: "contact",
+          name: "Legacy", price: "HK$880", period: "/ Event", highlight: false,
+          features: ["Everything in Heirloom", "1 Year Vault Storage", "Printed Memory Book", "4K Video Support"],
+          cta: "Go Pro", ctaAction: "contact",
         },
       ],
     },
     testimonials: {
-      title: "Loved by couples in Hong Kong",
+      title: "What Our Couples Say",
       items: [
-        { name: "Connie & Man", quote: "Our guests loved it — they were uploading photos before we even cut the cake. It felt like everyone had a front-row seat to every moment.", event: "March 2025, Hong Kong" },
-        { name: "Emily & James", quote: "So easy to set up. We printed the code on our table cards and by the end of the night we had over 300 photos from our guests.", event: "January 2025, Hong Kong" },
-        { name: "Sophie & Daniel", quote: "The bilingual support was perfect for our families. My parents could use it in Chinese without any help.", event: "December 2024, Hong Kong" },
+        { quote: "Seeing our wedding through the eyes of our guests was the greatest gift. SnapVault captured the moments our professional photographer couldn't possibly catch.", name: "Sarah & James", event: "October 2024" },
+        { quote: "The QR codes on the tables worked flawlessly. Even my 80-year-old grandmother was able to upload a photo of the cake!", name: "Mei & David", event: "September 2024" },
+        { quote: "The real-time slideshow during the reception was a huge hit! It brought everyone together and made the dinner feel so intimate.", name: "Eleanor & Thomas", event: "December 2024" },
       ],
     },
     cta: {
-      title: "Ready to capture every moment?",
-      sub: "Set up your wedding gallery in minutes. We'll send you your event code and you're good to go.",
-      button: "Get in touch",
-      orTry: "or",
-      tryFree: "try it free with code TESTWEDDING",
+      title: "Ready to Capture",
+      title2: "the Magic?",
+      sub: "Start your SnapVault today and ensure not a single candid smile goes unremembered.",
+      email: "Email Us",
+      tryDemo: "Try Demo",
     },
     footer: {
-      tagline: "Wedding memories, shared instantly.",
-      links: ["Features", "Pricing", "Contact"],
-      copy: "© 2025 SnapVault. Made with love in Hong Kong.",
+      tagline: "The Curated Heirloom Experience. Preserving candid memories for the most beautiful days of your life.",
+      service: "Service",
+      serviceLinks: ["How it works", "Features", "Pricing"],
+      company: "Company",
+      companyLinks: ["About Us", "Success Stories", "Contact"],
+      legal: "Legal",
+      legalLinks: ["Privacy Policy", "Terms of Service"],
+      copy: "© 2025 SnapVault. The Curated Heirloom Experience.",
     },
   },
   "zh-Hant": {
-    nav: { howItWorks: "如何運作", features: "功能特點", pricing: "收費", haveCode: "我有婚禮代碼 →" },
+    nav: {
+      howItWorks: "如何運作",
+      features: "功能特點",
+      pricing: "收費",
+      enterCode: "輸入活動代碼",
+    },
     hero: {
-      headline: "每位賓客，每個瞬間，一個相簿。",
-      sub: "SnapVault 為你的婚禮建立專屬相簿 — 毋須下載 App。賓客只需輸入代碼，即可即時分享照片。",
+      headline1: "保存每個",
+      headline2: "珍貴瞬間。",
+      sub: "你婚禮的數位傳家寶。讓每位賓客成為故事述說者。即時收集回憶，遠離社交媒體的喧囂。",
       cta: "立即開始",
-      haveCode: "我已有代碼",
+      haveCode: "我有代碼？",
+      stat1Value: "10,000+", stat1Label: "已分享照片",
+      stat2Value: "500+",   stat2Label: "快樂新人",
+      stat3Value: "99.9%",  stat3Label: "系統運行時間",
     },
     how: {
-      title: "如何運作",
+      title: "無縫的體驗",
       steps: [
-        { icon: "✉️", title: "獲取專屬代碼", body: "我們為你建立私人相簿並提供短代碼，印在請柬或婚禮手冊上即可。" },
-        { icon: "📸", title: "賓客用手機上傳", body: "無需登記，無需下載 App。輸入代碼，點擊，即時分享，只需數秒。" },
-        { icon: "🖼️", title: "即時共享相簿", body: "每張照片即時呈現，所有賓客共同欣賞。標記時刻，重溫美好回憶。" },
+        { icon: "qr_code_2",    title: "1. 獲取專屬代碼",  body: "建立你的相簿庫，獲取活動唯一二維碼。印在座位卡上或在場地展示。" },
+        { icon: "add_a_photo",  title: "2. 賓客上傳",     body: "賓客只需掃描即拍。無需下載 App。照片即時流入你的私人相簿。" },
+        { icon: "photo_library",title: "3. 查看相簿",     body: "即時重溫精彩時刻。精心整理數位傳家寶，永久下載高解析度回憶。" },
       ],
     },
     features: {
-      title: "所需功能，一應俱全",
+      eyebrow: "每個像素都精益求精",
+      title: "典藏品質",
+      sub: "專為豪華婚禮的高要求而設計，確保私密、快速與優雅。",
       items: [
-        { icon: "📲", title: "無需下載 App", body: "任何智能手機瀏覽器均可使用，賓客打開連結即可。" },
-        { icon: "⚡", title: "即時相簿", body: "賓客上傳後照片即時顯示，無需重新整理。" },
-        { icon: "🏷️", title: "標籤與篩選", body: "按儀式、宴會、家人等分類，輕鬆整理回憶。" },
-        { icon: "🌐", title: "雙語支援", body: "完整英文及繁體中文支援，適合多元文化婚禮。" },
-        { icon: "🔒", title: "安全管理", body: "密碼保護刪除功能，只有你才能管理相簿。" },
-        { icon: "🗜️", title: "自動壓縮", body: "上傳前於裝置端壓縮照片，快速且節省儲存空間。" },
+        { icon: "devices",              title: "無需下載 App",  body: "瀏覽器即用體驗，適用於任何智能手機。賓客零障礙使用。",                       wide: true },
+        { icon: "bolt",                 title: "即時更新",     body: "照片在拍攝後數秒內即顯示於相簿中。",                                         highlight: true },
+        { icon: "sell",                 title: "標籤與篩選",   body: "按時刻分類：儀式、晚宴或派對。" },
+        { icon: "translate",            title: "雙語支援",     body: "完美支援 EN/TC，適合國際婚禮。" },
+        { icon: "admin_panel_settings", title: "管理員刪除",   body: "完全掌控你的相簿。即時移除不想要的照片。" },
+        { icon: "compress",             title: "智能自動壓縮", body: "高質素影像在任何網速下即時載入，不耗盡賓客數據。",                           fullWidth: true },
       ],
     },
     pricing: {
-      title: "收費簡單透明",
-      sub: "一個活動，一次收費，無需訂閱。",
+      title: "為你的婚慶度身訂造",
+      sub: "選擇最適合你特別日子的方案。",
+      mostPopular: "最受歡迎",
       plans: [
         {
-          name: "免費版",
-          price: "HK$0",
-          period: "永久免費",
-          highlight: false,
-          description: "在大日子前先試用一下。",
-          features: ["1 個測試活動", "最多 50 張照片", "即時相簿", "標籤與篩選", "雙語支援"],
-          cta: "免費試用",
-          ctaAction: "try",
+          name: "回憶版", price: "HK$0", period: "/ 每個活動", highlight: false,
+          features: ["100張照片上限", "24小時使用", "標準解析度"],
+          cta: "免費開始", ctaAction: "try",
         },
         {
-          name: "標準版",
-          price: "HK$480",
-          period: "每個活動",
-          highlight: true,
-          description: "婚禮當天所需的一切功能。",
-          features: ["1 個活動，無限賓客", "無限照片", "自訂封面圖片", "標籤與篩選", "密碼保護管理", "優先設定支援"],
-          cta: "立即預訂",
-          ctaAction: "book",
+          name: "典藏版", price: "HK$480", period: "/ 每個活動", highlight: true,
+          features: ["無限照片", "全活動時長", "高解析度下載", "即時幻燈片功能"],
+          cta: "選擇方案", ctaAction: "book",
         },
         {
-          name: "尊享版",
-          price: "HK$880",
-          period: "每個活動",
-          highlight: false,
-          description: "為你的特別日子提供貼心體驗。",
-          features: ["標準版全部功能", "專屬代碼（例如：YOURNAMES）", "相簿下載（新人專用）", "WhatsApp 專屬支援", "婚後存檔（6 個月）"],
-          cta: "聯絡我們",
-          ctaAction: "contact",
+          name: "傳承版", price: "HK$880", period: "/ 每個活動", highlight: false,
+          features: ["典藏版全部功能", "1年相簿儲存", "印製回憶相冊", "4K影片支援"],
+          cta: "升級至 Pro", ctaAction: "contact",
         },
       ],
     },
     testimonials: {
-      title: "香港新人的心聲",
+      title: "新人的心聲",
       items: [
-        { name: "Connie & Man", quote: "賓客都非常喜歡 — 還未切蛋糕，大家已經在上傳照片了。感覺每個人都能看到婚禮的每個精彩時刻。", event: "2025年3月，香港" },
-        { name: "Emily & James", quote: "設置非常簡單。我們把代碼印在桌卡上，婚禮結束時已收到超過300張賓客拍攝的照片。", event: "2025年1月，香港" },
-        { name: "Sophie & Daniel", quote: "雙語支援非常貼心。我的父母可以用中文操作，完全不需要幫忙。", event: "2024年12月，香港" },
+        { quote: "透過賓客的眼睛看到我們的婚禮，是最珍貴的禮物。SnapVault 捕捉了專業攝影師無法兼顧的每個瞬間。", name: "Sarah & James", event: "2024年10月" },
+        { quote: "桌上的二維碼運作完美。連我80歲的祖母也能輕鬆上傳蛋糕的照片！", name: "Mei & David", event: "2024年9月" },
+        { quote: "宴會上的即時幻燈片大受歡迎！它把所有人凝聚在一起，讓晚宴更加溫馨。", name: "Eleanor & Thomas", event: "2024年12月" },
       ],
     },
     cta: {
-      title: "準備好記錄每個珍貴瞬間了嗎？",
-      sub: "數分鐘內即可建立婚禮相簿。我們會發送活動代碼給你，隨即可以使用。",
-      button: "立即聯絡",
-      orTry: "或",
-      tryFree: "用代碼 TESTWEDDING 免費試用",
+      title: "準備好捕捉",
+      title2: "奇蹟時刻了嗎？",
+      sub: "立即建立你的 SnapVault，確保每個珍貴笑容都永久留存。",
+      email: "電郵聯繫",
+      tryDemo: "試用示範",
     },
     footer: {
-      tagline: "婚禮回憶，即時分享。",
-      links: ["功能特點", "收費", "聯絡我們"],
-      copy: "© 2025 SnapVault。以愛製作於香港。",
+      tagline: "典藏傳家的體驗。為你生命中最美好的日子保留珍貴回憶。",
+      service: "服務",
+      serviceLinks: ["如何運作", "功能特點", "收費"],
+      company: "公司",
+      companyLinks: ["關於我們", "成功故事", "聯絡我們"],
+      legal: "法律",
+      legalLinks: ["私隱政策", "服務條款"],
+      copy: "© 2025 SnapVault. 典藏傳家的體驗。",
     },
   },
 };
-
-function CheckIcon() {
-  return (
-    <svg className="w-4 h-4 text-[#c9a227] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-    </svg>
-  );
-}
 
 export default function MarketingLandingPage({ language, setLanguage }) {
   const navigate = useNavigate();
@@ -192,42 +192,35 @@ export default function MarketingLandingPage({ language, setLanguage }) {
   };
 
   const handlePlanCta = (action) => {
-    if (action === "try") {
-      navigate("/enter");
-    } else {
-      document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
-    }
+    if (action === "try") navigate("/enter");
+    else document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <div className="min-h-screen bg-[#faf8f5] text-[#4a4a4a]">
+    <div className="bg-[#fcf9f8] text-[#1b1c1c] font-manrope scroll-smooth">
 
       {/* ── NAV ── */}
-      <header className="sticky top-0 z-50 bg-[#faf8f5]/95 backdrop-blur border-b border-[#e8d9a8]/60">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
-          <span className="font-serif text-xl font-bold text-[#4a4a4a] tracking-tight">SnapVault</span>
+      <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md">
+        <div className="flex justify-between items-center px-6 sm:px-8 py-4 max-w-7xl mx-auto">
+          <div className="text-2xl font-headline font-semibold text-[#775a19]">SnapVault</div>
 
-          {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-            <button onClick={() => scrollTo("how")} className="text-[#8a8a8a] hover:text-[#4a4a4a] transition">{copy.nav.howItWorks}</button>
-            <button onClick={() => scrollTo("features")} className="text-[#8a8a8a] hover:text-[#4a4a4a] transition">{copy.nav.features}</button>
-            <button onClick={() => scrollTo("pricing")} className="text-[#8a8a8a] hover:text-[#4a4a4a] transition">{copy.nav.pricing}</button>
-          </nav>
+          <div className="hidden md:flex items-center gap-8">
+            {[["how-it-works", copy.nav.howItWorks], ["features", copy.nav.features], ["pricing", copy.nav.pricing]].map(([id, label]) => (
+              <button key={id} onClick={() => scrollTo(id)} className="text-zinc-600 hover:text-[#775a19] transition-colors text-sm font-medium">
+                {label}
+              </button>
+            ))}
+          </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <LanguageToggle language={language} onChange={setLanguage} />
             <button
               onClick={() => navigate("/enter")}
-              className="hidden md:block px-4 py-2 rounded-lg border border-[#c9a227] text-[#c9a227] text-sm font-semibold hover:bg-[#c9a227] hover:text-white transition"
+              className="hidden md:block silk-gradient text-white px-5 py-2.5 rounded-full text-sm font-semibold tracking-wide hover:opacity-90 transition-opacity"
             >
-              {copy.nav.haveCode}
+              {copy.nav.enterCode}
             </button>
-            {/* Mobile hamburger */}
-            <button
-              className="md:hidden p-2 text-[#8a8a8a]"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Menu"
-            >
+            <button className="md:hidden p-2 text-zinc-500" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Menu">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 {mobileMenuOpen
                   ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -237,79 +230,98 @@ export default function MarketingLandingPage({ language, setLanguage }) {
           </div>
         </div>
 
-        {/* Mobile menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-[#e8d9a8]/60 bg-[#faf8f5] px-4 py-4 space-y-3">
-            <button onClick={() => scrollTo("how")} className="block w-full text-left text-sm font-medium text-[#4a4a4a] py-2">{copy.nav.howItWorks}</button>
-            <button onClick={() => scrollTo("features")} className="block w-full text-left text-sm font-medium text-[#4a4a4a] py-2">{copy.nav.features}</button>
-            <button onClick={() => scrollTo("pricing")} className="block w-full text-left text-sm font-medium text-[#4a4a4a] py-2">{copy.nav.pricing}</button>
-            <button
-              onClick={() => { setMobileMenuOpen(false); navigate("/enter"); }}
-              className="block w-full text-center px-4 py-3 rounded-lg border border-[#c9a227] text-[#c9a227] text-sm font-semibold"
-            >
-              {copy.nav.haveCode}
+          <div className="md:hidden border-t border-[#d0c5af]/30 bg-white px-6 py-4 space-y-2">
+            {[["how-it-works", copy.nav.howItWorks], ["features", copy.nav.features], ["pricing", copy.nav.pricing]].map(([id, label]) => (
+              <button key={id} onClick={() => scrollTo(id)} className="block w-full text-left text-sm font-medium text-[#1b1c1c] py-2">{label}</button>
+            ))}
+            <button onClick={() => { setMobileMenuOpen(false); navigate("/enter"); }} className="block w-full text-center mt-2 silk-gradient text-white px-4 py-3 rounded-full text-sm font-semibold">
+              {copy.nav.enterCode}
             </button>
           </div>
         )}
-      </header>
+      </nav>
 
       {/* ── HERO ── */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-16 sm:pb-24 text-center">
-        <div className="inline-block mb-6 px-4 py-1.5 rounded-full bg-[#c9a227]/10 border border-[#c9a227]/30 text-[#c9a227] text-sm font-medium">
-          Wedding photo sharing, reimagined
-        </div>
-        <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-[#4a4a4a] leading-tight mb-6">
-          {copy.hero.headline}
-        </h1>
-        <p className="text-lg sm:text-xl text-[#8a8a8a] max-w-2xl mx-auto mb-10 leading-relaxed">
-          {copy.hero.sub}
-        </p>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <button
-            onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
-            className="px-8 py-4 rounded-xl bg-[#c9a227] text-white font-semibold text-lg shadow-md hover:bg-[#b8911f] active:scale-[0.98] transition"
-          >
-            {copy.hero.cta}
-          </button>
-          <button
-            onClick={() => navigate("/enter")}
-            className="px-8 py-4 rounded-xl border-2 border-[#e8d9a8] text-[#4a4a4a] font-semibold text-lg hover:border-[#c9a227] transition"
-          >
-            {copy.hero.haveCode}
-          </button>
-        </div>
+      <section className="relative pt-32 pb-20 px-6 sm:px-8 overflow-hidden">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
 
-        {/* Social proof bar */}
-        <div className="mt-14 flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 text-sm text-[#8a8a8a]">
-          <div className="flex items-center gap-2">
-            <span className="text-[#c9a227] font-bold text-base">500+</span> photos shared per event
+          {/* Left: copy */}
+          <div className="z-10">
+            <h1 className="font-headline text-5xl md:text-7xl font-semibold leading-[1.1] mb-6 -tracking-wide">
+              {copy.hero.headline1} <br />
+              <span className="text-[#775a19] italic">{copy.hero.headline2}</span>
+            </h1>
+            <p className="text-lg md:text-xl text-[#4d4635] max-w-xl mb-10 leading-relaxed">
+              {copy.hero.sub}
+            </p>
+            <div className="flex flex-wrap gap-4 mb-12">
+              <button
+                onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
+                className="silk-gradient text-white px-8 py-4 rounded-full font-bold text-lg hover:shadow-xl hover:opacity-90 transition-all"
+              >
+                {copy.hero.cta}
+              </button>
+              <button
+                onClick={() => navigate("/enter")}
+                className="bg-white border border-[#d0c5af]/40 text-[#775a19] px-8 py-4 rounded-full font-bold text-lg hover:bg-[#f6f3f2] transition-all"
+              >
+                {copy.hero.haveCode}
+              </button>
+            </div>
+
+            {/* Stats */}
+            <div className="flex flex-wrap gap-8 items-center border-t border-[#d0c5af]/30 pt-8">
+              {[
+                [copy.hero.stat1Value, copy.hero.stat1Label],
+                [copy.hero.stat2Value, copy.hero.stat2Label],
+                [copy.hero.stat3Value, copy.hero.stat3Label],
+              ].map(([val, label]) => (
+                <div key={label}>
+                  <div className="text-2xl font-headline font-bold text-[#775a19]">{val}</div>
+                  <div className="text-xs uppercase tracking-widest text-[#4d4635] font-bold">{label}</div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="hidden sm:block w-px h-4 bg-[#e8d9a8]" />
-          <div className="flex items-center gap-2">
-            <span className="text-[#c9a227] font-bold text-base">0</span> app downloads needed
-          </div>
-          <div className="hidden sm:block w-px h-4 bg-[#e8d9a8]" />
-          <div className="flex items-center gap-2">
-            <span className="text-[#c9a227] font-bold text-base">2</span> languages supported
+
+          {/* Right: images */}
+          <div className="relative hidden lg:block">
+            {/* Main image */}
+            <div className="aspect-[4/5] rounded-xl overflow-hidden relative shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-700 bg-[#e4e2e1]">
+              <img
+                src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80"
+                alt="Wedding celebration"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            {/* Secondary image */}
+            <div className="absolute -bottom-8 -left-8 w-64 aspect-square rounded-xl overflow-hidden shadow-2xl -rotate-6 bg-[#e4e2e1]">
+              <img
+                src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?auto=format&fit=crop&w=400&q=80"
+                alt="Candid wedding photo"
+                className="w-full h-full object-cover"
+              />
+            </div>
           </div>
         </div>
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section id="how" className="bg-white border-y border-[#e8d9a8]/60 py-16 sm:py-24">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-center text-[#4a4a4a] mb-14">
-            {copy.how.title}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10">
+      <section id="how-it-works" className="py-24 px-6 sm:px-8 bg-[#f6f3f2]">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+            <h2 className="font-headline text-4xl md:text-5xl font-semibold mb-4 italic">{copy.how.title}</h2>
+            <div className="h-1 w-20 bg-[#d4ad65] mx-auto rounded-full" />
+          </div>
+          <div className="grid md:grid-cols-3 gap-12">
             {copy.how.steps.map((step, i) => (
-              <div key={i} className="text-center">
-                <div className="w-14 h-14 rounded-2xl bg-[#faf8f5] border border-[#e8d9a8] flex items-center justify-center text-2xl mx-auto mb-4">
-                  {step.icon}
+              <div key={i} className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-6 shadow-sm">
+                  <Icon name={step.icon} className="text-[#775a19] text-3xl" />
                 </div>
-                <div className="text-xs font-bold text-[#c9a227] uppercase tracking-widest mb-2">Step {i + 1}</div>
-                <h3 className="font-serif text-lg font-bold text-[#4a4a4a] mb-2">{step.title}</h3>
-                <p className="text-[#8a8a8a] text-sm leading-relaxed">{step.body}</p>
+                <h3 className="font-headline text-2xl font-semibold mb-4">{step.title}</h3>
+                <p className="text-[#4d4635] leading-relaxed">{step.body}</p>
               </div>
             ))}
           </div>
@@ -317,67 +329,103 @@ export default function MarketingLandingPage({ language, setLanguage }) {
       </section>
 
       {/* ── FEATURES ── */}
-      <section id="features" className="py-16 sm:py-24">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-center text-[#4a4a4a] mb-14">
-            {copy.features.title}
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {copy.features.items.map((f, i) => (
-              <div key={i} className="rounded-2xl border border-[#e8d9a8] bg-white p-6">
-                <div className="text-2xl mb-3">{f.icon}</div>
-                <h3 className="font-semibold text-[#4a4a4a] mb-1">{f.title}</h3>
-                <p className="text-sm text-[#8a8a8a] leading-relaxed">{f.body}</p>
-              </div>
-            ))}
+      <section id="features" className="py-24 px-6 sm:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+              <span className="text-[#775a19] font-bold tracking-widest text-xs uppercase block mb-2">{copy.features.eyebrow}</span>
+              <h2 className="font-headline text-4xl font-semibold">{copy.features.title}</h2>
+            </div>
+            <p className="max-w-md text-[#4d4635]">{copy.features.sub}</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {copy.features.items.map((item, i) => {
+              if (item.fullWidth) {
+                return (
+                  <div key={i} className="md:col-span-3 bg-[#f6f3f2] rounded-xl p-8 flex flex-col md:flex-row items-center gap-8">
+                    <div className="flex-1">
+                      <Icon name={item.icon} className="text-[#775a19] text-4xl mb-6 block" />
+                      <h4 className="font-headline text-2xl font-semibold mb-2">{item.title}</h4>
+                      <p className="text-[#4d4635]">{item.body}</p>
+                    </div>
+                    <div className="w-full md:w-1/2 h-48 rounded-lg overflow-hidden bg-[#e4e2e1]">
+                      <img
+                        src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=600&q=80"
+                        alt="Photography"
+                        className="w-full h-full object-cover grayscale"
+                      />
+                    </div>
+                  </div>
+                );
+              }
+              if (item.highlight) {
+                return (
+                  <div key={i} className="bg-[#775a19] text-white rounded-xl p-8 relative overflow-hidden flex flex-col justify-between">
+                    <Icon name={item.icon} className="text-[#e9c176] text-4xl mb-6 block" />
+                    <div>
+                      <h4 className="font-headline text-2xl font-semibold mb-2">{item.title}</h4>
+                      <p className="text-[#ffdea5]/80 text-sm">{item.body}</p>
+                    </div>
+                    <div className="absolute inset-0 silk-gradient opacity-20 pointer-events-none" />
+                  </div>
+                );
+              }
+              return (
+                <div key={i} className={`bg-[#f6f3f2] rounded-xl p-8 hover:bg-[#eae7e7] transition-colors ${item.wide ? "md:col-span-2 flex flex-col justify-between" : ""}`}>
+                  <Icon name={item.icon} className="text-[#775a19] text-4xl mb-6 block" />
+                  <div>
+                    <h4 className="font-headline text-xl font-semibold mb-2">{item.title}</h4>
+                    <p className="text-[#4d4635] text-sm">{item.body}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* ── PRICING ── */}
-      <section id="pricing" className="bg-white border-y border-[#e8d9a8]/60 py-16 sm:py-24">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-center text-[#4a4a4a] mb-3">
-            {copy.pricing.title}
-          </h2>
-          <p className="text-center text-[#8a8a8a] mb-14">{copy.pricing.sub}</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <section id="pricing" className="py-24 px-6 sm:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="font-headline text-4xl font-semibold mb-4 italic">{copy.pricing.title}</h2>
+            <p className="text-[#4d4635]">{copy.pricing.sub}</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8 items-center">
             {copy.pricing.plans.map((plan, i) => (
               <div
                 key={i}
-                className={`rounded-2xl border p-6 flex flex-col ${
+                className={`p-8 rounded-xl flex flex-col ${
                   plan.highlight
-                    ? "border-[#c9a227] bg-[#fffbf0] shadow-lg shadow-[#c9a227]/10 relative"
-                    : "border-[#e8d9a8] bg-white"
+                    ? "bg-white ring-2 ring-[#775a19] shadow-2xl relative scale-105 z-10"
+                    : "bg-[#f6f3f2] border border-[#d0c5af]/20"
                 }`}
               >
                 {plan.highlight && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[#c9a227] text-white text-xs font-bold uppercase tracking-wide whitespace-nowrap">
-                    Most popular
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 silk-gradient text-white px-4 py-1 rounded-full text-xs font-bold tracking-widest uppercase whitespace-nowrap">
+                    {copy.pricing.mostPopular}
                   </div>
                 )}
-                <div className="mb-5">
-                  <div className="font-bold text-[#4a4a4a] text-lg mb-1">{plan.name}</div>
-                  <div className="flex items-baseline gap-1 mb-1">
-                    <span className="font-serif text-3xl font-bold text-[#4a4a4a]">{plan.price}</span>
-                    <span className="text-[#8a8a8a] text-sm">{plan.period}</span>
-                  </div>
-                  <p className="text-sm text-[#8a8a8a]">{plan.description}</p>
+                <h3 className="font-headline text-xl font-semibold mb-2">{plan.name}</h3>
+                <div className="flex items-baseline gap-1 mb-6">
+                  <span className="text-4xl font-bold">{plan.price}</span>
+                  <span className="text-[#4d4635] text-sm">{plan.period}</span>
                 </div>
-                <ul className="space-y-2.5 mb-8 flex-1">
+                <ul className="space-y-4 mb-10 flex-grow">
                   {plan.features.map((feat, j) => (
-                    <li key={j} className="flex items-start gap-2 text-sm text-[#4a4a4a]">
-                      <CheckIcon />
+                    <li key={j} className="flex items-center gap-3 text-sm text-[#4d4635]">
+                      <Icon name="check_circle" className="text-[#775a19] text-lg" />
                       {feat}
                     </li>
                   ))}
                 </ul>
                 <button
                   onClick={() => handlePlanCta(plan.ctaAction)}
-                  className={`w-full py-3 rounded-xl font-semibold text-sm transition active:scale-[0.98] ${
+                  className={`w-full py-3 rounded-full font-bold transition-all ${
                     plan.highlight
-                      ? "bg-[#c9a227] text-white hover:bg-[#b8911f]"
-                      : "border border-[#c9a227] text-[#c9a227] hover:bg-[#c9a227] hover:text-white"
+                      ? "silk-gradient text-white hover:shadow-lg hover:opacity-90"
+                      : "border border-[#775a19] text-[#775a19] hover:bg-[#775a19]/5"
                   }`}
                 >
                   {plan.cta}
@@ -389,25 +437,17 @@ export default function MarketingLandingPage({ language, setLanguage }) {
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section className="py-16 sm:py-24">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-center text-[#4a4a4a] mb-14">
-            {copy.testimonials.title}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <section className="py-24 px-6 sm:px-8 bg-[#fcf9f8]">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="font-headline text-3xl md:text-4xl font-semibold mb-16 text-center italic">{copy.testimonials.title}</h2>
+          <div className="grid md:grid-cols-3 gap-10">
             {copy.testimonials.items.map((item, i) => (
-              <div key={i} className="rounded-2xl border border-[#e8d9a8] bg-white p-6">
-                <div className="flex gap-0.5 mb-4">
-                  {[...Array(5)].map((_, s) => (
-                    <svg key={s} className="w-4 h-4 text-[#c9a227]" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-                <p className="text-sm text-[#4a4a4a] leading-relaxed mb-4 italic">"{item.quote}"</p>
-                <div>
-                  <div className="font-semibold text-sm text-[#4a4a4a]">{item.name}</div>
-                  <div className="text-xs text-[#8a8a8a]">{item.event}</div>
+              <div key={i} className="relative p-8 rounded-xl bg-[#f6f3f2]">
+                <Icon name="format_quote" className="text-[#775a19]/20 text-6xl absolute -top-3 -left-1" />
+                <p className="italic text-[#1b1c1c] mb-6 relative z-10 leading-relaxed">"{item.quote}"</p>
+                <div className="border-t border-[#d0c5af]/30 pt-4">
+                  <div className="font-bold text-sm">{item.name}</div>
+                  <div className="text-xs text-[#4d4635] font-medium">{item.event}</div>
                 </div>
               </div>
             ))}
@@ -416,43 +456,72 @@ export default function MarketingLandingPage({ language, setLanguage }) {
       </section>
 
       {/* ── FINAL CTA ── */}
-      <section id="contact" className="bg-[#4a4a4a] py-16 sm:py-24 text-center">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6">
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-white mb-4">
-            {copy.cta.title}
-          </h2>
-          <p className="text-white/70 mb-10 text-lg leading-relaxed">{copy.cta.sub}</p>
-          <a
-            href="mailto:hello@snapvault.me"
-            className="inline-block px-10 py-4 rounded-xl bg-[#c9a227] text-white font-semibold text-lg hover:bg-[#b8911f] active:scale-[0.98] transition shadow-lg"
-          >
-            {copy.cta.button}
-          </a>
-          <p className="mt-6 text-white/50 text-sm">
-            {copy.cta.orTry}{" "}
-            <button
-              onClick={() => navigate("/enter")}
-              className="underline text-white/70 hover:text-white transition"
-            >
-              {copy.cta.tryFree}
-            </button>
-          </p>
+      <section id="contact" className="py-24 px-6 sm:px-8">
+        <div className="max-w-5xl mx-auto silk-gradient rounded-[2rem] p-12 md:p-20 text-center text-white relative overflow-hidden shadow-2xl">
+          <div className="relative z-10">
+            <h2 className="font-headline text-4xl md:text-6xl font-bold mb-6 italic leading-tight">
+              {copy.cta.title} <br /> {copy.cta.title2}
+            </h2>
+            <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-12 font-medium">{copy.cta.sub}</p>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-6">
+              <a
+                href="mailto:hello@snapvault.me"
+                className="bg-white text-[#775a19] px-10 py-4 rounded-full font-bold text-lg hover:bg-[#fcf9f8] transition-colors"
+              >
+                {copy.cta.email}
+              </a>
+              <button
+                onClick={() => navigate("/enter")}
+                className="text-white underline underline-offset-8 font-bold hover:text-white/80 transition-colors"
+              >
+                {copy.cta.tryDemo}
+              </button>
+            </div>
+          </div>
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-black/10 rounded-full blur-3xl pointer-events-none" />
         </div>
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="bg-[#3a3a3a] py-8">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-white/40">
+      <footer className="w-full py-12 px-6 sm:px-8 bg-zinc-100">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-7xl mx-auto">
+          <div className="md:col-span-1">
+            <div className="text-xl font-headline text-[#775a19] mb-4 font-semibold">SnapVault</div>
+            <p className="text-zinc-500 text-sm font-medium leading-relaxed">{copy.footer.tagline}</p>
+          </div>
           <div>
-            <span className="font-serif font-bold text-white/80 mr-2">SnapVault</span>
-            {copy.footer.tagline}
+            <h5 className="font-headline font-bold text-[#775a19] mb-6">{copy.footer.service}</h5>
+            <ul className="space-y-4">
+              {copy.footer.serviceLinks.map((link, i) => (
+                <li key={i}><button onClick={() => scrollTo(["how-it-works","features","pricing"][i])} className="text-zinc-500 text-sm hover:underline decoration-[#775a19]/30 underline-offset-4">{link}</button></li>
+              ))}
+            </ul>
           </div>
+          <div>
+            <h5 className="font-headline font-bold text-[#775a19] mb-6">{copy.footer.company}</h5>
+            <ul className="space-y-4">
+              {copy.footer.companyLinks.map((link, i) => (
+                <li key={i}><button className="text-zinc-500 text-sm hover:underline decoration-[#775a19]/30 underline-offset-4">{link}</button></li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h5 className="font-headline font-bold text-[#775a19] mb-6">{copy.footer.legal}</h5>
+            <ul className="space-y-4">
+              {copy.footer.legalLinks.map((link, i) => (
+                <li key={i}><button className="text-zinc-500 text-sm hover:underline decoration-[#775a19]/30 underline-offset-4">{link}</button></li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-zinc-200 flex flex-col md:flex-row justify-between gap-4 items-center">
+          <p className="text-zinc-500 text-xs font-medium">{copy.footer.copy}</p>
           <div className="flex gap-6">
-            {copy.footer.links.map((link, i) => (
-              <button key={i} className="hover:text-white/70 transition">{link}</button>
-            ))}
+            <a href="mailto:hello@snapvault.me" className="text-zinc-400 hover:text-[#775a19] transition-colors">
+              <Icon name="mail" className="text-lg" />
+            </a>
           </div>
-          <div>{copy.footer.copy}</div>
         </div>
       </footer>
 
