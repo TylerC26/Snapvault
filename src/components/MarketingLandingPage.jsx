@@ -52,17 +52,40 @@ const COPY = {
       plans: [
         {
           name: "Memories", price: "HK$0", period: "/ Event", highlight: false,
-          features: ["100 Photo Limit", "24 Hour Access", "Standard Resolution"],
+          description: "Try it out before your big day.",
+          features: [
+            "20 photos",
+            "24-hour access",
+            "Test event code only",
+            "Standard resolution",
+            "No custom QR code",
+            "No photo tagging",
+          ],
           cta: "Start Free", ctaAction: "try",
         },
         {
           name: "Heirloom", price: "HK$480", period: "/ Event", highlight: true,
-          features: ["Unlimited Photos", "Full Event Duration", "High-Res Downloads", "Live Slideshow Feature"],
+          description: "Everything you need for your wedding day.",
+          features: [
+            "Unlimited photos",
+            "Full event duration (up to 30 days)",
+            "High-resolution downloads",
+            "Photo tagging & filtering",
+            "Guest message notes",
+            "Customised QR code",
+            "Live slideshow feature",
+          ],
           cta: "Select Plan", ctaAction: "book",
         },
         {
           name: "Legacy", price: "HK$880", period: "/ Event", highlight: false,
-          features: ["Everything in Heirloom", "1 Year Vault Storage", "Printed Memory Book", "4K Video Support"],
+          description: "The complete heirloom experience.",
+          features: [
+            "Everything in Heirloom",
+            "1-year vault storage",
+            "Printed memory book (20 photos)",
+            "Free high-quality QR code cards",
+          ],
           cta: "Go Pro", ctaAction: "contact",
         },
       ],
@@ -138,17 +161,40 @@ const COPY = {
       plans: [
         {
           name: "回憶版", price: "HK$0", period: "/ 每個活動", highlight: false,
-          features: ["100張照片上限", "24小時使用", "標準解析度"],
+          description: "婚禮前先試用一下。",
+          features: [
+            "20張照片",
+            "24小時使用",
+            "僅限測試活動代碼",
+            "標準解析度",
+            "不含專屬二維碼",
+            "不含照片標籤功能",
+          ],
           cta: "免費開始", ctaAction: "try",
         },
         {
           name: "典藏版", price: "HK$480", period: "/ 每個活動", highlight: true,
-          features: ["無限照片", "全活動時長", "高解析度下載", "即時幻燈片功能"],
+          description: "婚禮當天所需的一切功能。",
+          features: [
+            "無限照片",
+            "全活動時長（最長30天）",
+            "高解析度下載",
+            "照片標籤與篩選",
+            "賓客留言備注",
+            "自訂二維碼",
+            "即時幻燈片功能",
+          ],
           cta: "選擇方案", ctaAction: "book",
         },
         {
           name: "傳承版", price: "HK$880", period: "/ 每個活動", highlight: false,
-          features: ["典藏版全部功能", "1年相簿儲存", "印製回憶相冊", "4K影片支援"],
+          description: "完整的典藏傳家體驗。",
+          features: [
+            "典藏版全部功能",
+            "1年相簿儲存",
+            "印製回憶相冊（精選20張）",
+            "免費高質素二維碼卡",
+          ],
           cta: "升級至 Pro", ctaAction: "contact",
         },
       ],
@@ -407,7 +453,8 @@ export default function MarketingLandingPage({ language, setLanguage }) {
                     {copy.pricing.mostPopular}
                   </div>
                 )}
-                <h3 className="font-headline text-xl font-semibold mb-2">{plan.name}</h3>
+                <h3 className="font-headline text-xl font-semibold mb-1">{plan.name}</h3>
+                <p className="text-sm text-[#4d4635] mb-4">{plan.description}</p>
                 <div className="flex items-baseline gap-1 mb-6">
                   <span className="text-4xl font-bold">{plan.price}</span>
                   <span className="text-[#4d4635] text-sm">{plan.period}</span>
