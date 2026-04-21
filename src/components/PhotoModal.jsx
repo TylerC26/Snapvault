@@ -85,7 +85,7 @@ export default function PhotoModal({ photos, currentIndex, onClose, onNavigate, 
       <button
         type="button"
         aria-label={t(language, "close")}
-        className="absolute top-[max(0.75rem,env(safe-area-inset-top))] right-4 sm:right-6 z-20 h-11 w-11 inline-flex items-center justify-center rounded-full bg-white/10 border border-white/30 text-white hover:bg-white/20 hover:border-white/60 text-2xl leading-none touch-manipulation transition-colors"
+        className="absolute top-[max(0.75rem,env(safe-area-inset-top))] right-4 sm:right-6 z-30 h-11 w-11 inline-flex items-center justify-center rounded-full bg-white/10 border border-white/30 text-white hover:bg-white/20 hover:border-white/60 text-2xl leading-none touch-manipulation transition-colors"
         onClick={(e) => { e.stopPropagation(); showPassword ? setShowPassword(false) : onClose(); }}
       >
         ✕
@@ -93,7 +93,7 @@ export default function PhotoModal({ photos, currentIndex, onClose, onNavigate, 
 
       <div
         className="absolute inset-0 flex flex-col items-center justify-center px-4 pt-16 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
-        onClick={(e) => e.stopPropagation()}
+        onClick={!showPassword ? onClose : undefined}
         onTouchStart={(e) => {
           touchStartX.current = e.changedTouches[0].clientX;
         }}
