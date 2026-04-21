@@ -85,9 +85,9 @@ export default function PhotoModal({ photos, currentIndex, onClose, onNavigate, 
           type="button"
           onClick={showPassword ? () => setShowPassword(false) : onClose}
           aria-label={t(language, "close")}
-          className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-[#e9dfc9]/80 hover:text-white text-2xl font-light touch-manipulation transition-colors"
+          className="min-h-[44px] min-w-[44px] h-11 w-11 inline-flex items-center justify-center rounded-full bg-[#17120f]/70 border border-[#c79a5c]/50 text-[#e9dfc9] hover:text-white hover:bg-[#17120f] hover:border-[#c79a5c] text-2xl leading-none touch-manipulation transition-colors"
         >
-          <span aria-hidden className="font-display">×</span>
+          <span aria-hidden className="font-display -mt-0.5">×</span>
         </button>
       </div>
 

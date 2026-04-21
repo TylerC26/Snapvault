@@ -281,7 +281,7 @@ export default function MarketingLandingPage({ language, setLanguage }) {
             SnapVault
           </button>
 
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-8">
             {[
               ["how-it-works", copy.nav.howItWorks],
               ["features", copy.nav.features],
@@ -297,16 +297,16 @@ export default function MarketingLandingPage({ language, setLanguage }) {
             ))}
           </div>
 
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-3 sm:gap-5">
             <LanguageToggle language={language} onChange={setLanguage} />
             <button
               onClick={() => navigate("/enter")}
-              className="hidden md:inline-flex btn-ink"
+              className="hidden lg:inline-flex btn-ink"
             >
               {copy.nav.enterCode}
             </button>
             <button
-              className="md:hidden min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-[var(--ink)]"
+              className="lg:hidden min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-[var(--ink)]"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label={copy.nav.menu || "Menu"}
             >
@@ -320,7 +320,7 @@ export default function MarketingLandingPage({ language, setLanguage }) {
         </div>
 
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-[var(--rule)] bg-[var(--paper)] px-6 py-5">
+          <div className="lg:hidden border-t border-[var(--rule)] bg-[var(--paper)] px-6 py-5">
             {[
               ["how-it-works", copy.nav.howItWorks],
               ["features", copy.nav.features],

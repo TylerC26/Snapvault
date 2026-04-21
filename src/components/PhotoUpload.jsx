@@ -362,7 +362,7 @@ export default function PhotoUpload({ eventCode, language, availableTags }) {
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
                 placeholder={t(language, "captionPlaceholder")}
-                rows={3}
+                rows={2}
                 className="input-editorial !py-2 resize-none leading-relaxed"
               />
             </div>
