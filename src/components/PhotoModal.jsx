@@ -70,26 +70,26 @@ export default function PhotoModal({ photos, currentIndex, onClose, onNavigate, 
       className="fixed inset-0 z-50 bg-[#17120f]/97 backdrop-blur-md fade-in"
       onClick={!showPassword ? onClose : undefined}
     >
-      {/* Top bar — plate number, totals, close */}
+      {/* Plate counter — top left */}
       <div
-        className="absolute top-0 left-0 right-0 flex items-center justify-between px-5 sm:px-8 pt-[max(1rem,env(safe-area-inset-top))] pb-4 z-10"
+        className="absolute top-0 left-0 flex items-center gap-3 px-5 sm:px-8 pt-[max(1rem,env(safe-area-inset-top))] pb-4 z-10"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center gap-3 text-[#e9dfc9]">
-          <span className="w-6 h-px bg-[#c79a5c]" />
-          <span className="eyebrow !text-[#c79a5c]">
-            Plate № {plateNum} / {totalPlates}
-          </span>
-        </div>
-        <button
-          type="button"
-          onClick={showPassword ? () => setShowPassword(false) : onClose}
-          aria-label={t(language, "close")}
-          className="min-h-[44px] min-w-[44px] h-11 w-11 inline-flex items-center justify-center rounded-full bg-[#17120f]/70 border border-[#c79a5c]/50 text-[#e9dfc9] hover:text-white hover:bg-[#17120f] hover:border-[#c79a5c] text-2xl leading-none touch-manipulation transition-colors"
-        >
-          <span aria-hidden className="font-display -mt-0.5">×</span>
-        </button>
+        <span className="w-6 h-px bg-[#c79a5c]" />
+        <span className="eyebrow !text-[#c79a5c]">
+          Plate № {plateNum} / {totalPlates}
+        </span>
       </div>
+
+      {/* Close button — top right */}
+      <button
+        type="button"
+        aria-label={t(language, "close")}
+        className="absolute top-[max(0.75rem,env(safe-area-inset-top))] right-4 sm:right-6 z-20 h-11 w-11 inline-flex items-center justify-center rounded-full bg-white/10 border border-white/30 text-white hover:bg-white/20 hover:border-white/60 text-2xl leading-none touch-manipulation transition-colors"
+        onClick={(e) => { e.stopPropagation(); showPassword ? setShowPassword(false) : onClose(); }}
+      >
+        ✕
+      </button>
 
       <div
         className="absolute inset-0 flex flex-col items-center justify-center px-4 pt-16 pb-[max(1.5rem,env(safe-area-inset-bottom))]"

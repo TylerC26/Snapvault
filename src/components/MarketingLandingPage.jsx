@@ -24,9 +24,9 @@ const COPY = {
       haveCode: "Have a Code?",
       plateCaption1: "The Ceremony · Plate I",
       plateCaption2: "Reception · Plate II",
-      stat1Value: "10,000+", stat1Label: "Photographs",
-      stat2Value: "500+",    stat2Label: "Weddings",
-      stat3Value: "99.9%",   stat3Label: "Uptime",
+      stat1Value: "Launching", stat1Label: "2026",
+      stat2Value: "Early",     stat2Label: "Access",
+      stat3Value: "99.9%",     stat3Label: "Uptime",
     },
     how: {
       eyebrow: "A three-act ceremony",
@@ -146,9 +146,9 @@ const COPY = {
       haveCode: "已有代碼？",
       plateCaption1: "典禮 · 第 I 版",
       plateCaption2: "宴會 · 第 II 版",
-      stat1Value: "10,000+", stat1Label: "幀照片典藏",
-      stat2Value: "500+",    stat2Label: "對佳偶締盟",
-      stat3Value: "99.9%",   stat3Label: "系統運行",
+      stat1Value: "即將",   stat1Label: "上線 2026",
+      stat2Value: "早期",   stat2Label: "優先體驗",
+      stat3Value: "99.9%", stat3Label: "系統運行",
     },
     how: {
       eyebrow: "三幕典禮",
@@ -300,12 +300,6 @@ export default function MarketingLandingPage({ language, setLanguage }) {
           <div className="flex items-center gap-3 sm:gap-5">
             <LanguageToggle language={language} onChange={setLanguage} />
             <button
-              onClick={() => navigate("/enter")}
-              className="hidden lg:inline-flex btn-ink"
-            >
-              {copy.nav.enterCode}
-            </button>
-            <button
               className="lg:hidden min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-[var(--ink)]"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label={copy.nav.menu || "Menu"}
@@ -334,12 +328,6 @@ export default function MarketingLandingPage({ language, setLanguage }) {
                 {label}
               </button>
             ))}
-            <button
-              onClick={() => { setMobileMenuOpen(false); navigate("/enter"); }}
-              className="btn-ink mt-5 w-full justify-center"
-            >
-              {copy.nav.enterCode}
-            </button>
           </div>
         )}
       </nav>
