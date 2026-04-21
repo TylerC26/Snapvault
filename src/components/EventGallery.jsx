@@ -195,21 +195,31 @@ export default function EventGallery({ language, setLanguage }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#faf8f5]">
-      <header className="sticky top-0 z-40 bg-[#faf8f5]/95 backdrop-blur border-b border-[#e8d9a8]/50 pt-[env(safe-area-inset-top)]">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
-          <button
-            type="button"
-            onClick={goToHeroPage}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center -m-2 text-[#8a8a8a] text-sm hover:text-[#4a4a4a] touch-manipulation"
-          >
-            ← {t(language, "back")}
-          </button>
-          <h1 className="font-display text-lg sm:text-xl font-serif text-[#4a4a4a] truncate">
-            {navTitle}
-          </h1>
-          <div className="flex items-center">
-            <LanguageToggle language={language} onChange={setLanguage} />
+    <div className="min-h-screen bg-[var(--paper)] paper-grain">
+      {/* ── Masthead ── */}
+      <header className="sticky top-0 z-40 bg-[var(--paper)]/95 backdrop-blur-sm border-b border-[var(--rule)] pt-[env(safe-area-inset-top)]">
+        <div className="max-w-5xl mx-auto px-5 sm:px-8">
+          <div className="flex items-center justify-between gap-3 py-3 sm:py-4">
+            <button
+              type="button"
+              onClick={goToHeroPage}
+              className="group min-h-[44px] inline-flex items-center gap-2 text-[var(--ink-mute)] hover:text-[var(--ink)] transition-colors"
+              aria-label={t(language, "back")}
+            >
+              <span aria-hidden className="inline-block w-5 h-px bg-current group-hover:w-7 transition-all" />
+              <span className="eyebrow !text-inherit">{t(language, "back")}</span>
+            </button>
+
+            <div className="flex-1 text-center truncate">
+              <div className="font-display italic text-lg sm:text-2xl text-[var(--ink)] truncate leading-tight">
+                {navTitle}
+              </div>
+              <div className="eyebrow mt-0.5 truncate">№ {displayCode}</div>
+            </div>
+
+            <div className="flex items-center">
+              <LanguageToggle language={language} onChange={setLanguage} />
+            </div>
           </div>
         </div>
       </header>
@@ -217,81 +227,161 @@ export default function EventGallery({ language, setLanguage }) {
       <main
         className={
           showLanding
-            ? "px-4 sm:px-6 py-4 sm:py-6 h-[calc(100svh-6rem)] sm:h-[calc(100svh-6.5rem)] pb-[max(1rem,env(safe-area-inset-bottom))]"
-            : "max-w-2xl mx-auto px-4 sm:px-6 py-4 sm:py-6 pb-[max(6rem,calc(1.5rem+env(safe-area-inset-bottom)))]"
+            ? "px-4 sm:px-6 py-6 sm:py-8 min-h-[calc(100svh-5.5rem)] pb-[max(1.5rem,env(safe-area-inset-bottom))] flex items-center justify-center"
+            : "max-w-5xl mx-auto px-5 sm:px-8 py-8 sm:py-12 pb-[max(6rem,calc(2rem+env(safe-area-inset-bottom)))]"
         }
       >
         {showLanding && (
-          <section className="h-full flex items-center justify-center">
+          <section className="w-full max-w-md mx-auto text-center">
+            <p className="eyebrow eyebrow-accent rise rise-1">
+              You are cordially invited
+            </p>
+            <h2 className="rise rise-2 font-display italic text-4xl sm:text-5xl text-[var(--ink)] mt-4 leading-[1.05]">
+              {navTitle}
+            </h2>
+            <div className="flex items-center justify-center gap-3 mt-4 rise rise-3">
+              <span className="w-10 h-px bg-[var(--sepia)]" />
+              <span className="font-display italic text-sm text-[var(--sepia)]">
+                {t(language, "appSubtitle")}
+              </span>
+              <span className="w-10 h-px bg-[var(--sepia)]" />
+            </div>
+
             <button
               type="button"
               onClick={() => setShowLanding(false)}
-              className="relative h-full max-h-full max-w-full aspect-[691/1024] rounded-2xl overflow-hidden border-2 border-[#e8d9a8] touch-manipulation"
+              className="mt-8 group block w-full touch-manipulation rise rise-4"
+              aria-label={t(language, "enterCelebration")}
             >
-              <img src={heroImage} alt={navTitle} className="w-full h-full object-cover" />
+              <div className="relative p-3 bg-[var(--paper-card)] shadow-[0_1px_0_rgba(28,24,22,0.04),0_20px_40px_-20px_rgba(28,24,22,0.35)] border border-[var(--rule)]">
+                <div className="relative aspect-[3/4] overflow-hidden bg-[var(--paper-deep)]">
+                  <img
+                    src={heroImage}
+                    alt={navTitle}
+                    className="w-full h-full object-cover transition-transform duration-[1200ms] group-hover:scale-[1.03]"
+                  />
+                  <div className="absolute inset-0 ring-1 ring-inset ring-black/5 pointer-events-none" />
+                </div>
+                {/* caption plate */}
+                <div className="pt-4 pb-3 px-1">
+                  <div className="eyebrow">The Ceremony · Plate I</div>
+                  <div className="font-display italic text-[var(--ink)] mt-1 text-lg">
+                    Enter the gallery
+                  </div>
+                </div>
+              </div>
             </button>
+
+            <p className="mt-8 text-xs text-[var(--ink-mute)] font-serif italic rise rise-5">
+              Tap the plate to open
+            </p>
           </section>
         )}
 
         {!showLanding && (
-          <>
-            <h2 className="font-display text-2xl font-serif text-[#4a4a4a] mb-6 text-center">
-              {t(language, "appSubtitle")}
-            </h2>
-
+          <div className="fade-in">
+            {/* ── Section title: Contribute ── */}
             <div className="mb-8">
+              <div className="flex items-baseline justify-between gap-4">
+                <div>
+                  <p className="eyebrow eyebrow-accent">§ I</p>
+                  <h2 className="font-display italic text-3xl sm:text-4xl text-[var(--ink)] mt-1">
+                    Contribute a memory
+                  </h2>
+                </div>
+                <span className="hidden sm:block flex-1 h-px bg-[var(--rule)] mb-2" />
+                <span className="hidden sm:inline font-serif italic text-sm text-[var(--ink-mute)] mb-1">
+                  {t(language, "appSubtitle")}
+                </span>
+              </div>
+              <p className="font-serif text-[var(--ink-soft)] mt-3 max-w-prose leading-relaxed">
+                Each photograph becomes part of this evening's record. Add a note, a tag,
+                and a name — or simply upload and let the moment speak.
+              </p>
+            </div>
+
+            <div className="mb-14">
               <PhotoUpload eventCode={displayCode} language={language} availableTags={availableTags} />
             </div>
 
+            {/* ── Section title: The Plates ── */}
+            <div className="mb-6">
+              <div className="flex items-baseline justify-between gap-4">
+                <div>
+                  <p className="eyebrow eyebrow-accent">§ II</p>
+                  <h2 className="font-display italic text-3xl sm:text-4xl text-[var(--ink)] mt-1">
+                    The plates
+                  </h2>
+                </div>
+                <span className="hidden sm:block flex-1 h-px bg-[var(--rule)] mb-2" />
+              </div>
+            </div>
+
             {!loading && photos.length > 0 && (
-              <div className="mb-6 -mx-4 sm:mx-0 overflow-x-auto overscroll-x-contain scrollbar-hide">
-                <p className="text-sm font-medium text-[#4a4a4a] mb-2 px-4 sm:px-0">{t(language, "filterByTag")}</p>
-                <div className="flex gap-2 px-4 sm:px-0 sm:flex-wrap pb-2 sm:pb-0">
-                  <button
-                    onClick={() => setFilterTag(null)}
-                    className={`min-h-[44px] shrink-0 px-4 py-2.5 rounded-full text-sm font-medium transition touch-manipulation ${
-                      !filterTag
-                        ? "bg-[#c9a227] text-white"
-                        : "bg-white border border-[#e8d9a8] text-[#4a4a4a] hover:border-[#c9a227]"
-                    }`}
-                  >
-                    {t(language, "all")}
-                  </button>
-                  {availableTags.map((tag) => {
-                    const count = photos.filter((p) => p.tags?.includes(tag)).length;
-                    if (count === 0) return null;
-                    return (
-                      <button
-                        key={tag}
-                        onClick={() => setFilterTag(tag)}
-                        className={`min-h-[44px] shrink-0 px-4 py-2.5 rounded-full text-sm font-medium transition touch-manipulation ${
-                          filterTag === tag
-                            ? "bg-[#c9a227] text-white"
-                            : "bg-white border border-[#e8d9a8] text-[#4a4a4a] hover:border-[#c9a227]"
-                        }`}
-                      >
-                        {tagLabel(language, tag)} ({count})
-                      </button>
-                    );
-                  })}
+              <div className="mb-8 -mx-4 sm:mx-0">
+                <div className="flex items-baseline justify-between px-4 sm:px-0 mb-3">
+                  <p className="eyebrow">{t(language, "filterByTag")}</p>
+                  {filterTag && (
+                    <button
+                      onClick={() => setFilterTag(null)}
+                      className="text-xs font-serif italic text-[var(--sepia)] hover:text-[var(--sepia-deep)] underline underline-offset-4"
+                    >
+                      {t(language, "all")}
+                    </button>
+                  )}
+                </div>
+                <div className="overflow-x-auto overscroll-x-contain scrollbar-hide">
+                  <div className="flex gap-2 px-4 sm:px-0 sm:flex-wrap pb-2 sm:pb-0">
+                    <button
+                      onClick={() => setFilterTag(null)}
+                      data-active={!filterTag}
+                      className="tag-chip shrink-0 min-h-[40px]"
+                    >
+                      {t(language, "all")} · {photos.length}
+                    </button>
+                    {availableTags.map((tag) => {
+                      const count = photos.filter((p) => p.tags?.includes(tag)).length;
+                      if (count === 0) return null;
+                      return (
+                        <button
+                          key={tag}
+                          onClick={() => setFilterTag(tag)}
+                          data-active={filterTag === tag}
+                          className="tag-chip shrink-0 min-h-[40px]"
+                        >
+                          {tagLabel(language, tag)} · {count}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             )}
 
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-red-700 text-sm">
-                {error}
+              <div className="mb-8 border-l-2 border-[var(--sepia)] bg-[var(--sepia-soft)] px-4 py-3">
+                <p className="eyebrow eyebrow-accent mb-1">Notice</p>
+                <p className="font-serif italic text-sm text-[var(--sepia-deep)]">{error}</p>
               </div>
             )}
 
             {loading ? (
-              <div className="flex justify-center py-16">
-                <div className="w-10 h-10 border-2 border-[#c9a227] border-t-transparent rounded-full animate-spin" />
+              <div className="flex flex-col items-center justify-center py-20 gap-4">
+                <div className="w-8 h-8 border border-[var(--sepia)] border-t-transparent rounded-full animate-spin" />
+                <p className="eyebrow">{t(language, "loading")}</p>
               </div>
             ) : (
               <PhotoGrid photos={filteredPhotos} onDelete={handleDelete} language={language} />
             )}
-          </>
+
+            {/* Colophon */}
+            <div className="mt-24 pt-8 border-t border-[var(--rule)] text-center">
+              <p className="eyebrow">Colophon</p>
+              <p className="font-display italic text-[var(--ink-soft)] mt-2">
+                Set in Cormorant &amp; Noto Serif · Printed as it happens
+              </p>
+            </div>
+          </div>
         )}
       </main>
     </div>

@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>SnapVault · Vellum & Ink — Redesign Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Source+Sans+3:ital,wght@0,400;0,600;0,700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --paper:#f4efe6; --paper-deep:#ebe3d3; --paper-card:#fbf8f1;
+    --ink:#1c1816; --ink-soft:#4a4139; --ink-mute:#8b7f70;
+    --sepia:#7a5230; --sepia-deep:#5a3a1f; --sepia-soft:rgba(122,82,48,.12);
+    --rule:rgba(28,24,22,.12); --rule-strong:rgba(28,24,22,.28);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Noto Serif',Georgia,serif;
+    color:var(--ink); background:#e8e1d1;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  }
+  .wrap{max-width:1280px; margin:0 auto; padding:60px 28px 120px}
+  .doc-title{
+    font-family:'Cormorant Garamond',serif; font-weight:600;
+    font-size:44px; letter-spacing:-.01em; margin:0 0 6px;
+  }
+  .doc-title em{color:var(--sepia); font-style:italic}
+  .doc-sub{font-family:'Noto Serif',serif; font-style:italic; color:var(--ink-soft); margin:0 0 40px}
+  .stack{display:grid; gap:44px}
+  .screen{
+    background:var(--paper); position:relative;
+    border:1px solid var(--rule); box-shadow:0 30px 60px -30px rgba(28,24,22,.35);
+    overflow:hidden;
+  }
+  .screen-label{
+    font-family:'Source Sans 3',sans-serif; font-weight:600;
+    text-transform:uppercase; letter-spacing:.22em; font-size:11px;
+    color:var(--ink-mute); margin:0 0 12px;
+  }
+  .screen-label b{color:var(--sepia); font-weight:600}
+  .device{
+    display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:32px;
+  }
+  @media (max-width: 900px){ .device{grid-template-columns:1fr} }
+
+  /* Shared editorial primitives */
+  .eyebrow{font-family:'Source Sans 3',sans-serif; text-transform:uppercase; letter-spacing:.22em; font-size:.7rem; font-weight:600; color:var(--ink-mute)}
+  .eyebrow-accent{color:var(--sepia)}
+  .rule{display:inline-block; width:64px; height:1px; background:var(--sepia); vertical-align:middle}
+  .rule-ink{background:var(--rule-strong)}
+  .btn-ink{
+    font-family:'Source Sans 3',sans-serif; font-weight:600; letter-spacing:.18em;
+    text-transform:uppercase; font-size:.78rem;
+    background:var(--ink); color:var(--paper); border:1px solid var(--ink);
+    padding:14px 26px; display:inline-flex; align-items:center; gap:12px; cursor:pointer;
+  }
+  .btn-ghost{
+    font-family:'Source Sans 3',sans-serif; font-weight:600; letter-spacing:.18em;
+    text-transform:uppercase; font-size:.72rem;
+    background:transparent; color:var(--ink); border:1px solid var(--rule-strong);
+    padding:12px 20px; cursor:pointer;
+  }
+  .tag{
+    font-family:'Source Sans 3',sans-serif; font-size:.7rem; font-weight:600;
+    letter-spacing:.14em; text-transform:uppercase; padding:8px 14px;
+    border:1px solid var(--rule-strong); color:var(--ink-soft); background:transparent;
+  }
+  .tag.on{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+  .paper-grain{position:relative}
+  .paper-grain::before{
+    content:""; position:absolute; inset:0; pointer-events:none; opacity:.35;
+    mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='7'/><feColorMatrix values='0 0 0 0 0.45  0 0 0 0 0.38  0 0 0 0 0.30  0 0 0 0.18 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    background-size:220px 220px;
+  }
+
+  /* ── Landing (EventCodeEntry) ── */
+  .s-landing{min-height:720px; padding:0 40px; display:flex; flex-direction:column}
+  .s-landing .masthead{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:20px 0; border-bottom:1px solid var(--rule);
+  }
+  .s-landing .title-font{font-family:'Cormorant Garamond',serif; font-style:italic; font-size:20px}
+  .lang{display:inline-flex; align-items:center; font-family:'Source Sans 3',sans-serif;
+    text-transform:uppercase; letter-spacing:.18em; font-size:.72rem; font-weight:600; color:var(--ink-mute)}
+  .lang .on{color:var(--ink); text-decoration:underline; text-underline-offset:6px; text-decoration-color:var(--sepia); text-decoration-thickness:1.5px}
+  .lang .sep{display:inline-block; width:1px; height:12px; background:var(--rule-strong); margin:0 10px}
+  .landing-body{flex:1; display:flex; align-items:center; justify-content:center; text-align:center; padding:30px 0}
+  .landing-inner{max-width:560px; width:100%}
+  .landing-inner h1{
+    font-family:'Cormorant Garamond',serif; font-weight:500;
+    font-size:92px; line-height:.95; margin:24px 0 0;
+  }
+  .landing-inner h1 em{font-style:italic}
+  .landing-inner h1 span{letter-spacing:-.015em}
+  .tilde{display:flex; align-items:center; justify-content:center; gap:16px; margin-top:28px}
+  .tilde .line{width:40px; height:1px; background:var(--rule-strong)}
+  .tilde em{color:var(--sepia); font-family:'Cormorant Garamond',serif; font-style:italic; font-size:18px}
+  .code-input{
+    width:100%; max-width:420px; margin:0 auto; display:block;
+    text-align:center; font-family:'Cormorant Garamond',serif; font-size:38px;
+    letter-spacing:.35em; padding:12px 0;
+    background:transparent; border:0; border-bottom:1px solid var(--rule-strong);
+    color:var(--ink); outline:none;
+  }
+  .ticks{display:flex; align-items:center; justify-content:center; gap:3px; margin-top:-6px}
+  .ticks span{background:var(--sepia); width:1px}
+  .corner-tl{position:absolute; top:110px; left:28px; display:flex; align-items:center; gap:12px}
+  .corner-tl .d{width:4px;height:4px;border-radius:50%;background:var(--sepia)}
+  .corner-tl .l{width:32px;height:1px;background:var(--sepia)}
+  .corner-br{position:absolute; bottom:40px; right:28px; display:flex; align-items:center; gap:12px}
+  .corner-br .d{width:4px;height:4px;border-radius:50%;background:var(--sepia)}
+  .corner-br .l{width:32px;height:1px;background:var(--sepia)}
+  .footer-flourish{margin-top:64px; display:flex; align-items:center; justify-content:center; gap:12px; color:var(--ink-mute)}
+  .footer-flourish .l{width:1px;height:12px;background:var(--rule-strong)}
+  .footer-flourish em{font-family:'Cormorant Garamond',serif; font-style:italic; font-size:14px}
+
+  /* ── Gallery (EventGallery + PhotoGrid) ── */
+  .s-gallery{min-height:860px; padding:0}
+  .g-mast{
+    position:sticky; top:0; background:var(--paper); border-bottom:1px solid var(--rule);
+    padding:14px 32px; display:flex; align-items:center; justify-content:space-between; gap:12px;
+  }
+  .g-mast .back{display:inline-flex; align-items:center; gap:8px; color:var(--ink-mute); font-family:'Source Sans 3',sans-serif; text-transform:uppercase; letter-spacing:.22em; font-size:.7rem; font-weight:600}
+  .g-mast .back .dash{width:20px; height:1px; background:currentColor}
+  .g-mast .titleblock{text-align:center; flex:1}
+  .g-mast .titleblock .t{font-family:'Cormorant Garamond',serif; font-style:italic; font-size:22px; color:var(--ink)}
+  .g-mast .titleblock .n{font-family:'Source Sans 3',sans-serif; text-transform:uppercase; letter-spacing:.22em; font-size:.65rem; color:var(--ink-mute); margin-top:2px}
+  .g-body{max-width:1040px; margin:0 auto; padding:36px 32px 60px}
+  .section-head{display:flex; align-items:baseline; gap:20px; margin-bottom:12px}
+  .section-head .num{color:var(--sepia); font-family:'Source Sans 3',sans-serif; text-transform:uppercase; letter-spacing:.22em; font-size:.7rem; font-weight:600}
+  .section-head h2{font-family:'Cormorant Garamond',serif; font-style:italic; font-size:36px; margin:0; color:var(--ink)}
+  .section-head .sep{flex:1; height:1px; background:var(--rule)}
+  .prose-intro{font-family:'Noto Serif',serif; color:var(--ink-soft); line-height:1.7; margin:10px 0 28px; max-width:58ch}
+  .drop{
+    background:var(--paper-card); padding:44px 24px; text-align:center;
+    background-image:
+      linear-gradient(to right,var(--rule-strong) 50%,transparent 50%),
+      linear-gradient(to right,var(--rule-strong) 50%,transparent 50%),
+      linear-gradient(to bottom,var(--rule-strong) 50%,transparent 50%),
+      linear-gradient(to bottom,var(--rule-strong) 50%,transparent 50%);
+    background-position:left top, left bottom, left top, right top;
+    background-repeat:repeat-x, repeat-x, repeat-y, repeat-y;
+    background-size:12px 1px, 12px 1px, 1px 12px, 1px 12px;
+  }
+  .drop svg{color:var(--sepia); margin-bottom:14px}
+  .drop .head{font-family:'Cormorant Garamond',serif; font-style:italic; font-size:26px}
+  .drop .meta{display:flex; align-items:center; justify-content:center; gap:12px; margin-top:14px}
+  .drop .meta .l{width:32px; height:1px; background:var(--rule-strong)}
+
+  .tagstrip{display:flex; gap:8px; flex-wrap:wrap; margin:14px 0 22px}
+  .grid{column-count:4; column-gap:16px}
+  @media (max-width:900px){ .grid{column-count:2} }
+  .tile{
+    position:relative; overflow:hidden; margin-bottom:16px; break-inside:avoid;
+    background:var(--paper-deep); box-shadow:inset 0 0 0 1px rgba(28,24,22,.06);
+  }
+  .tile img{display:block; width:100%; height:auto}
+  .tile .plate-num{
+    position:absolute; top:8px; left:10px; color:rgba(255,255,255,.92);
+    font-family:'Cormorant Garamond',serif; font-style:italic; font-size:12px;
+    text-shadow:0 1px 2px rgba(0,0,0,.6);
+  }
+  .tile .cap{
+    position:absolute; left:0; right:0; bottom:0; padding:9px 12px;
+    background:rgba(251,248,241,.96); border-top:1px solid var(--rule);
+    display:flex; justify-content:space-between; align-items:baseline; gap:8px;
+  }
+  .tile .cap .eb{font-family:'Source Sans 3',sans-serif; font-size:.65rem; letter-spacing:.18em; text-transform:uppercase; color:var(--ink-mute); font-weight:600}
+  .tile .cap em{font-family:'Cormorant Garamond',serif; font-style:italic; color:var(--sepia); font-size:.85rem}
+
+  .colophon{text-align:center; margin-top:48px; padding-top:24px; border-top:1px solid var(--rule)}
+  .colophon em{font-family:'Cormorant Garamond',serif; font-style:italic; color:var(--ink-soft); display:block; margin-top:6px}
+
+  /* ── Modal ── */
+  .s-modal{background:#17120f; min-height:620px; position:relative; padding:20px 32px 40px; color:#e9dfc9}
+  .m-top{display:flex; align-items:center; justify-content:space-between}
+  .m-top .plate{display:flex; align-items:center; gap:10px}
+  .m-top .plate .line{width:24px;height:1px;background:#c79a5c}
+  .m-top .plate span{color:#c79a5c; font-family:'Source Sans 3',sans-serif; text-transform:uppercase; letter-spacing:.22em; font-size:.7rem; font-weight:600}
+  .m-close{color:rgba(233,223,201,.8); font-size:28px; font-family:'Cormorant Garamond',serif}
+  .m-body{display:flex; flex-direction:column; align-items:center; gap:20px; padding:20px 0}
+  .m-img-wrap{position:relative; max-width:560px; width:100%}
+  .m-img{display:block; width:100%; height:auto; box-shadow:0 30px 60px -20px rgba(0,0,0,.6)}
+  .m-arrow{
+    position:absolute; top:50%; transform:translateY(-50%);
+    display:flex; flex-direction:column; align-items:center; gap:8px; color:rgba(233,223,201,.7);
+  }
+  .m-arrow.l{left:-44px}
+  .m-arrow.r{right:-44px}
+  .m-arrow .chev{font-family:'Cormorant Garamond',serif; font-size:28px; line-height:1}
+  .m-arrow .stem{width:1px; height:48px; background:currentColor}
+  .m-tags{display:flex; gap:8px; justify-content:center}
+  .m-tag{font-family:'Source Sans 3',sans-serif; font-size:.6rem; letter-spacing:.18em; text-transform:uppercase; color:#c79a5c; border:1px solid rgba(199,154,92,.4); padding:5px 10px}
+  .m-caphead{display:flex; align-items:center; justify-content:center; gap:12px; margin-top:8px}
+  .m-caphead .l{width:32px; height:1px; background:rgba(199,154,92,.6)}
+  .m-caphead span{color:#c79a5c; font-family:'Source Sans 3',sans-serif; text-transform:uppercase; letter-spacing:.22em; font-size:.7rem; font-weight:600}
+  .m-quote{font-family:'Cormorant Garamond',serif; font-style:italic; color:#f4efe6; font-size:22px; line-height:1.35; text-align:center; max-width:520px; margin:10px auto 0}
+  .m-guest{font-family:'Noto Serif',serif; font-style:italic; color:rgba(233,223,201,.65); text-align:center; margin-top:8px; font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow eyebrow-accent">SnapVault · Redesign reference</p>
+  <h1 class="doc-title">Vellum <em>&amp;</em> Ink</h1>
+  <p class="doc-sub">An editorial wedding broadsheet. Three of the redesigned screens rendered in full fidelity below — landing (left), gallery (below), and the full-screen plate view.</p>
+
+  <div class="stack">
+
+    <!-- ── 1. LANDING + 2. MODAL side by side ── -->
+    <div class="device">
+
+      <!-- 1. LANDING -->
+      <div>
+        <p class="screen-label"><b>01</b> · Event code entry</p>
+        <div class="screen s-landing paper-grain">
+          <div class="corner-tl"><span class="d"></span><span class="l"></span></div>
+          <div class="corner-br"><span class="l"></span><span class="d"></span></div>
+
+          <div class="masthead">
+            <span class="eyebrow eyebrow-accent">Vol. I — The Archive</span>
+            <span class="title-font">SnapVault</span>
+            <span class="lang"><span class="on">EN</span><span class="sep"></span>繁中</span>
+          </div>
+
+          <div class="landing-body">
+            <div class="landing-inner">
+              <p class="eyebrow">— Est. for the happy few —</p>
+              <h1><em>Enter</em><br/><span>the gallery</span></h1>
+              <div class="tilde">
+                <span class="line"></span>
+                <em>Love, Laughs &amp; Lovely Moments</em>
+                <span class="line"></span>
+              </div>
+
+              <div style="margin-top:52px;">
+                <p class="eyebrow" style="margin-bottom:20px;">Enter wedding code</p>
+                <input class="code-input" value="TESTWEDDING" readonly />
+                <div class="ticks" style="margin-top:2px">
+                  <span style="height:6px"></span><span style="height:10px"></span><span style="height:6px"></span>
+                </div>
+                <button class="btn-ink" style="margin-top:36px; min-width:220px; justify-content:center">Enter <span>→</span></button>
+              </div>
+
+              <div class="footer-flourish">
+                <span class="l"></span>
+                <em>SnapVault — a keepsake of candid light</em>
+                <span class="l"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. MODAL -->
+      <div>
+        <p class="screen-label"><b>02</b> · Full-screen plate view</p>
+        <div class="screen s-modal">
+          <div class="m-top">
+            <div class="plate">
+              <span class="line"></span>
+              <span>Plate № 024 / 138</span>
+            </div>
+            <div class="m-close">×</div>
+          </div>
+          <div class="m-body">
+            <div class="m-img-wrap">
+              <div class="m-arrow l"><span class="chev">‹</span><span class="stem"></span></div>
+              <img class="m-img" src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=900&q=80" alt="" />
+              <div class="m-arrow r"><span class="chev">›</span><span class="stem"></span></div>
+            </div>
+            <div class="m-tags">
+              <span class="m-tag">Ceremony</span>
+              <span class="m-tag">Portrait</span>
+            </div>
+            <div class="m-caphead">
+              <span class="l"></span>
+              <span>A note from the guest</span>
+              <span class="l"></span>
+            </div>
+            <p class="m-quote">“The light through the window the moment they said yes — I'll never forget it.”</p>
+            <p class="m-guest">— Eleanor</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. GALLERY ── -->
+    <div>
+      <p class="screen-label"><b>03</b> · Event gallery · § I Contribute · § II Plates</p>
+      <div class="screen s-gallery paper-grain">
+        <div class="g-mast">
+          <span class="back"><span class="dash"></span>Back</span>
+          <div class="titleblock">
+            <div class="t">Connie &amp; Man</div>
+            <div class="n">№ TESTWEDDING</div>
+          </div>
+          <span class="lang"><span class="on">EN</span><span class="sep"></span>繁中</span>
+        </div>
+
+        <div class="g-body">
+          <!-- § I  -->
+          <div style="margin-bottom:40px">
+            <div class="section-head">
+              <div>
+                <div class="num">§ I</div>
+                <h2 style="margin-top:4px">Contribute a memory</h2>
+              </div>
+              <div class="sep"></div>
+              <em style="font-family:'Noto Serif',serif; font-style:italic; color:var(--ink-mute); font-size:14px">Love, Laughs &amp; Lovely Moments</em>
+            </div>
+            <p class="prose-intro">Each photograph becomes part of this evening's record. Add a note, a tag, and a name — or simply upload and let the moment speak.</p>
+
+            <div class="drop">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.2">
+                <path d="M8 16h6l3-4h14l3 4h6v22H8z" stroke-linejoin="round"/>
+                <circle cx="24" cy="26" r="7"/><circle cx="24" cy="26" r="3"/><circle cx="37" cy="19" r=".7" fill="currentColor"/>
+              </svg>
+              <div class="head">Tap or drop photos here</div>
+              <div class="meta"><span class="l"></span><span class="eyebrow">JPG, PNG, WebP, GIF</span><span class="l"></span></div>
+            </div>
+          </div>
+
+          <!-- § II -->
+          <div class="section-head">
+            <div>
+              <div class="num">§ II</div>
+              <h2 style="margin-top:4px">The plates</h2>
+            </div>
+            <div class="sep"></div>
+          </div>
+
+          <div class="tagstrip">
+            <span class="tag on">All · 138</span>
+            <span class="tag">Ceremony · 44</span>
+            <span class="tag">Reception · 62</span>
+            <span class="tag">First Dance · 11</span>
+            <span class="tag">Cake · 8</span>
+            <span class="tag">Portrait · 13</span>
+          </div>
+
+          <div class="grid">
+            <!-- tiles -->
+            <figure class="tile">
+              <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80" alt="">
+              <span class="plate-num">№ 001</span>
+              <figcaption class="cap"><span class="eb">Plate № 001</span><em>Ceremony</em></figcaption>
+            </figure>
+            <figure class="tile">
+              <img src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?auto=format&fit=crop&w=600&q=80" alt="">
+              <span class="plate-num">№ 002</span>
+            </figure>
+            <figure class="tile">
+              <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80" alt="">
+              <span class="plate-num">№ 003</span>
+            </figure>
+            <figure class="tile">
+              <img src="https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=600&q=80" alt="">
+              <span class="plate-num">№ 004</span>
+              <figcaption class="cap"><span class="eb">Plate № 004</span><em>First Dance</em></figcaption>
+            </figure>
+            <figure class="tile">
+              <img src="https://images.unsplash.com/photo-1525772764200-be829a350797?auto=format&fit=crop&w=600&q=80" alt="">
+              <span class="plate-num">№ 005</span>
+            </figure>
+            <figure class="tile">
+              <img src="https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=600&q=80" alt="">
+              <span class="plate-num">№ 006</span>
+            </figure>
+            <figure class="tile">
+              <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&q=80" alt="">
+              <span class="plate-num">№ 007</span>
+              <figcaption class="cap"><span class="eb">Plate № 007</span><em>Bouquet</em></figcaption>
+            </figure>
+            <figure class="tile">
+              <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=600&q=80" alt="">
+              <span class="plate-num">№ 008</span>
+            </figure>
+            <figure class="tile">
+              <img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=600&q=80" alt="">
+              <span class="plate-num">№ 009</span>
+            </figure>
+            <figure class="tile">
+              <img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=600&q=80" alt="">
+              <span class="plate-num">№ 010</span>
+              <figcaption class="cap"><span class="eb">Plate № 010</span><em>Candid</em></figcaption>
+            </figure>
+            <figure class="tile">
+              <img src="https://images.unsplash.com/photo-1507217633297-c9815ce2ac8e?auto=format&fit=crop&w=600&q=80" alt="">
+              <span class="plate-num">№ 011</span>
+            </figure>
+            <figure class="tile">
+              <img src="https://images.unsplash.com/photo-1530023367847-a683933f4172?auto=format&fit=crop&w=600&q=80" alt="">
+              <span class="plate-num">№ 012</span>
+            </figure>
+          </div>
+
+          <div class="colophon">
+            <span class="eyebrow">Colophon</span>
+            <em>Set in Cormorant &amp; Noto Serif · Printed as it happens</em>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

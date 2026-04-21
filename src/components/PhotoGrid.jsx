@@ -34,54 +34,70 @@ export default function PhotoGrid({ photos, onDelete, language }) {
 
   if (!photos?.length) {
     return (
-      <div className="text-center py-16 text-[#8a8a8a]">
-        <p className="text-lg font-medium">{t(language, "noPhotosYet")}</p>
-        <p className="text-sm mt-1">{t(language, "beFirst")}</p>
+      <div className="text-center py-20">
+        <span className="rule inline-block" />
+        <p className="font-display italic text-3xl text-[var(--ink)] mt-6">
+          {t(language, "noPhotosYet")}
+        </p>
+        <p className="font-serif italic text-[var(--ink-mute)] mt-2 text-base">
+          {t(language, "beFirst")}
+        </p>
+        <span className="rule rule-ink inline-block mt-6 opacity-40" />
       </div>
     );
   }
 
+  const plateNum = (i) => String(i + 1).padStart(3, "0");
+
   return (
     <>
-      <p className="text-[#8a8a8a] text-sm mb-4">
+      <p className="eyebrow mb-5">
         {visiblePhotos.length}{" "}
         {visiblePhotos.length === 1
           ? t(language, "photoSharedOne")
           : t(language, "photosSharedMany")}
       </p>
-      <div className="columns-2 sm:columns-3 gap-2 sm:gap-3 space-y-2 sm:space-y-3">
+
+      <div className="columns-2 sm:columns-3 lg:columns-4 gap-3 sm:gap-4 [column-fill:_balance]">
         {visiblePhotos.map((photo, index) => (
           <button
             key={photo.id}
             onClick={() => setSelectedIndex(index)}
-            className="block w-full break-inside-avoid touch-manipulation"
+            className="group mb-3 sm:mb-4 block w-full break-inside-avoid touch-manipulation text-left"
+            aria-label={photo.caption || t(language, "weddingPhoto")}
           >
-            <div className="relative aspect-square overflow-hidden rounded-xl bg-[#e8f0e8]/50">
+            <figure className="tile">
               <img
                 src={photo.url}
                 alt={photo.caption || t(language, "weddingPhoto")}
-                className="w-full h-full object-cover"
+                className="w-full h-auto block"
                 loading="lazy"
                 onError={() => handleImageError(photo.id)}
               />
-              {photo.tags?.length > 0 && (
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
-                  <div className="flex flex-wrap gap-1">
-                    {photo.tags.slice(0, 2).map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-[10px] px-2 py-0.5 rounded-full bg-white/90 text-[#4a4a4a] font-medium"
-                      >
-                        {tagLabel(language, tag)}
-                      </span>
-                    ))}
-                    {photo.tags.length > 2 && (
-                      <span className="text-[10px] text-white/90">+{photo.tags.length - 2}</span>
-                    )}
-                  </div>
+
+              {/* Bottom caption plate — appears on hover */}
+              <figcaption
+                className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out
+                           bg-[var(--paper-card)]/96 backdrop-blur-sm border-t border-[var(--rule)] px-3 py-2.5"
+              >
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="eyebrow">Plate № {plateNum(index)}</span>
+                  {photo.tags?.[0] && (
+                    <span className="font-display italic text-xs text-[var(--sepia)] truncate">
+                      {tagLabel(language, photo.tags[0])}
+                    </span>
+                  )}
                 </div>
-              )}
-            </div>
+              </figcaption>
+
+              {/* Persistent plate number in corner — always visible for editorial touch */}
+              <span
+                aria-hidden
+                className="absolute top-2 left-2 font-display italic text-xs text-white/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)] group-hover:opacity-0 transition-opacity duration-300"
+              >
+                № {plateNum(index)}
+              </span>
+            </figure>
           </button>
         ))}
       </div>

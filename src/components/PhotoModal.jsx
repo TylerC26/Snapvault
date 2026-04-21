@@ -62,20 +62,37 @@ export default function PhotoModal({ photos, currentIndex, onClose, onNavigate, 
 
   if (!photo) return null;
 
+  const plateNum = String(currentIndex + 1).padStart(3, "0");
+  const totalPlates = String(photos.length).padStart(3, "0");
+
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]"
+      className="fixed inset-0 z-50 bg-[#17120f]/97 backdrop-blur-md fade-in"
       onClick={!showPassword ? onClose : undefined}
     >
-      <button
-        className="absolute top-[max(1rem,env(safe-area-inset-top))] right-4 min-h-[48px] min-w-[48px] flex items-center justify-center text-white/80 hover:text-white text-3xl touch-manipulation"
-        onClick={showPassword ? () => setShowPassword(false) : onClose}
-        aria-label="Close"
-      >
-        ×
-      </button>
+      {/* Top bar — plate number, totals, close */}
       <div
-        className="max-w-full max-h-[85vh] flex flex-col items-center"
+        className="absolute top-0 left-0 right-0 flex items-center justify-between px-5 sm:px-8 pt-[max(1rem,env(safe-area-inset-top))] pb-4 z-10"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center gap-3 text-[#e9dfc9]">
+          <span className="w-6 h-px bg-[#c79a5c]" />
+          <span className="eyebrow !text-[#c79a5c]">
+            Plate № {plateNum} / {totalPlates}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={showPassword ? () => setShowPassword(false) : onClose}
+          aria-label="Close"
+          className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-[#e9dfc9]/80 hover:text-white text-2xl font-light touch-manipulation transition-colors"
+        >
+          <span aria-hidden className="font-display">×</span>
+        </button>
+      </div>
+
+      <div
+        className="absolute inset-0 flex flex-col items-center justify-center px-4 pt-16 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
         onClick={(e) => e.stopPropagation()}
         onTouchStart={(e) => {
           touchStartX.current = e.changedTouches[0].clientX;
@@ -94,83 +111,124 @@ export default function PhotoModal({ photos, currentIndex, onClose, onNavigate, 
           <button
             type="button"
             onClick={goPrev}
-            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 text-white text-xl hover:bg-black/60"
             aria-label="Previous photo"
+            className="group absolute left-2 sm:left-8 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 text-[#e9dfc9]/70 hover:text-[#c79a5c] transition-colors touch-manipulation p-2"
           >
-            ‹
+            <span aria-hidden className="font-display text-3xl leading-none">‹</span>
+            <span className="hidden sm:block w-px h-12 bg-current" />
           </button>
         )}
+
         <img
           src={photo.url}
           alt={photo.caption || t(language, "weddingPhoto")}
-          className="max-w-full max-h-[70vh] sm:max-h-[75vh] object-contain rounded-lg"
+          className="max-w-full max-h-[65vh] sm:max-h-[72vh] object-contain shadow-[0_30px_60px_-20px_rgba(0,0,0,0.6)]"
           onError={onClose}
+          onClick={(e) => e.stopPropagation()}
         />
+
         {hasMultiple && (
           <button
             type="button"
             onClick={goNext}
-            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 text-white text-xl hover:bg-black/60"
             aria-label="Next photo"
+            className="group absolute right-2 sm:right-8 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 text-[#e9dfc9]/70 hover:text-[#c79a5c] transition-colors touch-manipulation p-2"
           >
-            ›
+            <span aria-hidden className="font-display text-3xl leading-none">›</span>
+            <span className="hidden sm:block w-px h-12 bg-current" />
           </button>
         )}
-        {photo.tags?.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-2 justify-center">
-            {photo.tags.map((tag) => (
-              <span
-                key={tag}
-                className="text-xs px-3 py-1 rounded-full bg-white/20 text-white font-medium"
-              >
-                {tagLabel(language, tag)}
-              </span>
-            ))}
-          </div>
-        )}
-        {photo.guestName && (
-          <p className="mt-2 text-white/70 text-center text-sm">
-            {t(language, "sharedBy", { name: photo.guestName })}
-          </p>
-        )}
-        {onDelete && (
-          <button
-            type="button"
-            onClick={handleDeleteClick}
-            className="mt-4 px-4 py-2 rounded-lg border border-red-400/60 text-red-300 hover:bg-red-500/20 text-sm font-medium touch-manipulation"
-          >
-            {t(language, "deletePhoto")}
-          </button>
-        )}
+
+        {/* Caption plate */}
+        <div
+          className="mt-6 max-w-lg w-full mx-auto text-center"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {photo.tags?.length > 0 && (
+            <div className="mb-3 flex flex-wrap gap-2 justify-center">
+              {photo.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="font-sans text-[10px] tracking-[0.18em] uppercase text-[#c79a5c] border border-[#c79a5c]/40 px-2.5 py-1"
+                >
+                  {tagLabel(language, tag)}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {photo.caption && (
+            <div className="px-2">
+              <div className="flex items-center justify-center gap-3 mb-3">
+                <span className="w-8 h-px bg-[#c79a5c]/60" />
+                <span className="eyebrow !text-[#c79a5c]">
+                  {t(language, "guestNoteLabel")}
+                </span>
+                <span className="w-8 h-px bg-[#c79a5c]/60" />
+              </div>
+              <p className="font-display italic text-[#f4efe6] text-lg sm:text-xl leading-snug">
+                “{photo.caption}”
+              </p>
+              {photo.guestName && (
+                <p className="font-serif italic text-sm text-[#e9dfc9]/65 mt-3">
+                  — {photo.guestName}
+                </p>
+              )}
+            </div>
+          )}
+
+          {!photo.caption && photo.guestName && (
+            <p className="font-display italic text-[#e9dfc9]/80 text-base">
+              {t(language, "sharedBy", { name: photo.guestName })}
+            </p>
+          )}
+
+          {onDelete && (
+            <button
+              type="button"
+              onClick={handleDeleteClick}
+              className="mt-5 inline-flex items-center gap-2 font-sans text-[10px] tracking-[0.2em] uppercase text-[#e9dfc9]/50 hover:text-[#d8847a] border-b border-transparent hover:border-[#d8847a]/60 pb-0.5 transition-colors touch-manipulation"
+            >
+              <span aria-hidden>✕</span>
+              {t(language, "deletePhoto")}
+            </button>
+          )}
+        </div>
       </div>
 
       {showPassword && (
         <div
-          className="absolute inset-0 flex items-center justify-center bg-black/80 p-4"
+          className="absolute inset-0 flex items-center justify-center bg-[#17120f]/85 backdrop-blur-sm p-4 fade-in"
           onClick={() => setShowPassword(false)}
         >
           <div
-            className="bg-[#2a2a2a] rounded-2xl p-6 max-w-sm w-full shadow-xl"
+            className="bg-[var(--paper-card)] max-w-sm w-full shadow-2xl border border-[var(--rule)] p-7"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="text-white font-medium mb-2">{t(language, "enterPasswordToDelete")}</p>
+            <p className="eyebrow eyebrow-accent mb-2">Confirm deletion</p>
+            <p className="font-display italic text-xl text-[var(--ink)] mb-4">
+              {t(language, "enterPasswordToDelete")}
+            </p>
+            <div className="h-px bg-[var(--rule)] mb-5" />
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={t(language, "password")}
-              className="w-full px-4 py-3 rounded-xl bg-[#1a1a1a] border border-[#444] text-white placeholder-[#888] focus:border-[#c9a227] outline-none text-base mb-3"
+              className="input-editorial mb-4"
               autoFocus
               onKeyDown={(e) => e.key === 'Enter' && handleDeleteConfirm()}
             />
             {deleteError && (
-              <p className="text-red-400 text-sm mb-3">{deleteError}</p>
+              <p className="font-serif italic text-sm text-[var(--sepia-deep)] mb-4">
+                — {deleteError} —
+              </p>
             )}
-            <div className="flex gap-2">
+            <div className="flex gap-3 mt-2">
               <button
                 type="button"
                 onClick={() => setShowPassword(false)}
-                className="flex-1 py-2.5 rounded-xl border border-[#555] text-white/90 font-medium touch-manipulation"
+                className="btn-ghost flex-1 touch-manipulation"
               >
                 {t(language, "cancel")}
               </button>
@@ -178,7 +236,7 @@ export default function PhotoModal({ photos, currentIndex, onClose, onNavigate, 
                 type="button"
                 onClick={handleDeleteConfirm}
                 disabled={deleting || !password}
-                className="flex-1 py-2.5 rounded-xl bg-red-600 text-white font-medium hover:bg-red-500 disabled:opacity-50 touch-manipulation"
+                className="btn-ink flex-1 !bg-[#7a2f2a] !border-[#7a2f2a] hover:!bg-[#5a1f1a] hover:!border-[#5a1f1a] touch-manipulation"
               >
                 {deleting ? t(language, "deleting") : t(language, "delete")}
               </button>

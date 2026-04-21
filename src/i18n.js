@@ -104,6 +104,8 @@ export const TEXT = {
     cancel: "Cancel",
     delete: "Delete",
     deleting: "Deleting…",
+    guestNoteLabel: "A note from the guest",
+    captionPlaceholder: "Leave a heartfelt note for the newlyweds (optional)",
   },
   "zh-Hant": {
     appTitle: "SnapVault",
@@ -174,6 +176,8 @@ export const TEXT = {
     cancel: "取消",
     delete: "刪除",
     deleting: "刪除中…",
+    guestNoteLabel: "賓客的留言",
+    captionPlaceholder: "給新人留下一段暖心的話（選填）",
   },
 };
 

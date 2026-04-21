@@ -184,7 +184,7 @@ export default function PhotoUpload({ eventCode, language, availableTags }) {
   const showReviewStep = pendingFiles.length > 0 && !uploading;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <input
         ref={fileInputRef}
         type="file"
@@ -194,162 +194,254 @@ export default function PhotoUpload({ eventCode, language, availableTags }) {
         onChange={onFileInputChange}
       />
 
+      {/* ── Drop zone / upload state ── */}
       {!showReviewStep && (
         <div
           onDrop={onDrop}
           onDragOver={onDragOver}
           onDragLeave={onDragLeave}
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => !uploading && fileInputRef.current?.click()}
           className={`
-            border-2 border-dashed rounded-2xl p-6 sm:p-8 min-h-[120px] text-center cursor-pointer transition touch-manipulation
-            ${isDragging ? 'border-[#c9a227] bg-[#f5e6e8]/50' : 'border-[#e8d9a8] bg-white/80 hover:bg-[#faf8f5] active:bg-[#f5e6e8]/30'}
-            ${uploading ? 'pointer-events-none opacity-80' : ''}
+            relative cursor-pointer touch-manipulation transition-colors
+            bg-[var(--paper-card)]
+            ${uploading ? 'pointer-events-none' : 'hover:bg-[#fff]'}
           `}
+          style={{
+            backgroundImage:
+              'linear-gradient(to right, var(--rule-strong) 50%, transparent 50%), linear-gradient(to right, var(--rule-strong) 50%, transparent 50%), linear-gradient(to bottom, var(--rule-strong) 50%, transparent 50%), linear-gradient(to bottom, var(--rule-strong) 50%, transparent 50%)',
+            backgroundPosition: 'left top, left bottom, left top, right top',
+            backgroundRepeat: 'repeat-x, repeat-x, repeat-y, repeat-y',
+            backgroundSize: '12px 1px, 12px 1px, 1px 12px, 1px 12px',
+          }}
         >
-          {uploading ? (
-            <div className="space-y-3">
-              <div className="w-10 h-10 border-2 border-[#c9a227] border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="text-[#4a4a4a] font-medium">{t(language, "uploading")}</p>
-              {Object.keys(progress).length > 0 && (
-                <div className="space-y-1 text-sm text-[#8a8a8a]">
-                  {Object.entries(progress).map(([name, pct]) => (
-                    <div key={name} className="flex justify-between gap-2">
-                      <span className="truncate">{name.split('-')[0]}</span>
-                      <span>{pct}%</span>
-                    </div>
-                  ))}
+          <div
+            className={`px-6 sm:px-10 py-10 sm:py-14 text-center transition-colors ${
+              isDragging ? 'bg-[var(--sepia-soft)]' : ''
+            }`}
+          >
+            {uploading ? (
+              <div className="space-y-6">
+                <div className="flex items-center justify-center gap-3">
+                  <span className="w-10 h-px bg-[var(--sepia)]" />
+                  <span className="eyebrow eyebrow-accent">{t(language, "uploading")}</span>
+                  <span className="w-10 h-px bg-[var(--sepia)]" />
                 </div>
-              )}
-            </div>
-          ) : (
-            <>
-              <div className="text-4xl mb-2">📸</div>
-              <p className="text-[#4a4a4a] font-semibold">{t(language, "tapOrDrop")}</p>
-              <p className="text-sm text-[#8a8a8a] mt-1">{t(language, "fileTypes")}</p>
-            </>
-          )}
+
+                {Object.keys(progress).length > 0 && (
+                  <div className="max-w-md mx-auto space-y-2.5 text-left">
+                    {Object.entries(progress).map(([name, pct]) => {
+                      const label = name.split('-').slice(0, -1).join('-') || name;
+                      return (
+                        <div key={name} className="space-y-1">
+                          <div className="flex justify-between gap-2 text-xs text-[var(--ink-soft)] font-sans">
+                            <span className="truncate italic font-serif">{label}</span>
+                            <span className="tabular-nums">{pct}%</span>
+                          </div>
+                          <div className="h-px bg-[var(--rule)] relative overflow-hidden">
+                            <div
+                              className="absolute inset-y-0 left-0 bg-[var(--sepia)] transition-[width] duration-300"
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <div aria-hidden className="text-[var(--sepia)] mb-4">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 48 48"
+                    className="mx-auto w-10 h-10"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.2"
+                  >
+                    <path d="M8 16h6l3-4h14l3 4h6v22H8z" strokeLinejoin="round" />
+                    <circle cx="24" cy="26" r="7" />
+                    <circle cx="24" cy="26" r="3" />
+                    <circle cx="37" cy="19" r="0.7" fill="currentColor" />
+                  </svg>
+                </div>
+                <p className="font-display italic text-2xl text-[var(--ink)]">
+                  {t(language, "tapOrDrop")}
+                </p>
+                <div className="flex items-center justify-center gap-3 mt-4">
+                  <span className="w-8 h-px bg-[var(--rule-strong)]" />
+                  <p className="eyebrow">{t(language, "fileTypes")}</p>
+                  <span className="w-8 h-px bg-[var(--rule-strong)]" />
+                </div>
+              </>
+            )}
+          </div>
         </div>
       )}
 
+      {/* ── Review step ── */}
       {showReviewStep && (
-        <div className="space-y-4 rounded-2xl border border-[#e8d9a8] bg-white/80 p-4">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-[#4a4a4a]">
-              {pendingFiles.length}{" "}
-              {pendingFiles.length === 1
-                ? t(language, "selectedOne")
-                : t(language, "selectedMany")}
-            </p>
+        <div className="bg-[var(--paper-card)] border border-[var(--rule)] p-5 sm:p-7 space-y-6">
+          <div className="flex items-baseline justify-between gap-3">
+            <div>
+              <p className="eyebrow eyebrow-accent">Review</p>
+              <p className="font-display italic text-xl text-[var(--ink)] mt-0.5">
+                {pendingFiles.length}{" "}
+                <span className="text-[var(--ink-mute)]">
+                  {pendingFiles.length === 1
+                    ? t(language, "selectedOne")
+                    : t(language, "selectedMany")}
+                </span>
+              </p>
+            </div>
             <button
               type="button"
               onClick={clearSelection}
-              className="text-sm text-[#8a8a8a] hover:text-[#4a4a4a] underline touch-manipulation"
+              className="font-serif italic text-sm text-[var(--ink-mute)] hover:text-[var(--sepia)] underline underline-offset-4 decoration-[var(--rule-strong)] hover:decoration-[var(--sepia)] touch-manipulation"
             >
               {t(language, "clear")}
             </button>
           </div>
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-1">
-            {pendingFiles.map((file, i) => (
-              <button
-                key={`${file.name}-${i}`}
-                type="button"
-                onClick={() => setPreviewFile(file)}
-                className="shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-[#e8f0e8]/50 touch-manipulation"
-              >
-                <img
-                  src={URL.createObjectURL(file)}
-                  alt=""
-                  className="w-full h-full object-cover"
-                  onLoad={(e) => URL.revokeObjectURL(e.target.src)}
-                />
-              </button>
-            ))}
-            <button
-              type="button"
-              onClick={() => {
-                appendRef.current = true;
-                fileInputRef.current?.click();
-              }}
-              className="shrink-0 w-16 h-16 rounded-lg border-2 border-dashed border-[#e8d9a8] flex items-center justify-center text-[#8a8a8a] hover:border-[#c9a227] hover:text-[#c9a227] transition touch-manipulation"
-              aria-label={t(language, "addMoreAria")}
-            >
-              <span className="text-2xl leading-none">+</span>
-            </button>
-          </div>
-          <input
-            type="text"
-            value={guestName}
-            onChange={(e) => setGuestName(e.target.value)}
-            placeholder={t(language, "yourName")}
-            className="w-full min-h-[48px] px-4 py-3 rounded-xl border border-[#e8d9a8] bg-white focus:border-[#c9a227] focus:ring-1 focus:ring-[#c9a227] outline-none text-base"
-          />
-          <input
-            type="text"
-            value={caption}
-            onChange={(e) => setCaption(e.target.value)}
-            placeholder={t(language, "captionOptional")}
-            className="w-full min-h-[48px] px-4 py-3 rounded-xl border border-[#e8d9a8] bg-white focus:border-[#c9a227] focus:ring-1 focus:ring-[#c9a227] outline-none text-base"
-          />
-          <div className="-mx-1 overflow-x-auto overscroll-x-contain scrollbar-hide">
-            <p className="text-sm font-medium text-[#4a4a4a] mb-2">{t(language, "tagsOptional")}</p>
-            <div className="flex flex-wrap gap-2 pb-1">
-              {availableTags.map((tag) => (
+
+          {/* Thumbnail strip */}
+          <div className="-mx-1 overflow-x-auto scrollbar-hide">
+            <div className="flex gap-2 px-1 pb-2">
+              {pendingFiles.map((file, i) => (
                 <button
-                  key={tag}
+                  key={`${file.name}-${i}`}
                   type="button"
-                  onClick={() => toggleTag(tag)}
-                  className={`
-                    min-h-[44px] px-4 py-2.5 rounded-full text-sm font-medium transition touch-manipulation shrink-0
-                    ${selectedTags.includes(tag)
-                      ? 'bg-[#c9a227] text-white'
-                      : 'bg-white border border-[#e8d9a8] text-[#4a4a4a] hover:border-[#c9a227] active:border-[#c9a227]'}
-                  `}
+                  onClick={() => setPreviewFile(file)}
+                  className="relative shrink-0 w-20 h-20 overflow-hidden bg-[var(--paper-deep)] border border-[var(--rule)] touch-manipulation hover:border-[var(--sepia)] transition-colors"
                 >
-                  {tagLabel(language, tag)}
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt=""
+                    className="w-full h-full object-cover"
+                    onLoad={(e) => URL.revokeObjectURL(e.target.src)}
+                  />
+                  <span className="absolute bottom-0 left-0 right-0 text-[9px] font-sans tracking-[0.15em] uppercase text-white bg-black/45 py-0.5 text-center">
+                    № {String(i + 1).padStart(2, '0')}
+                  </span>
                 </button>
               ))}
+              <button
+                type="button"
+                onClick={() => {
+                  appendRef.current = true;
+                  fileInputRef.current?.click();
+                }}
+                className="shrink-0 w-20 h-20 border border-dashed border-[var(--rule-strong)] flex items-center justify-center text-[var(--ink-mute)] hover:text-[var(--sepia)] hover:border-[var(--sepia)] transition-colors touch-manipulation"
+                aria-label={t(language, "addMoreAria")}
+              >
+                <span className="text-2xl font-light leading-none">+</span>
+              </button>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={handleUpload}
-            className="w-full min-h-[48px] py-2.5 rounded-xl bg-[#c9a227] text-white font-semibold hover:bg-[#b8911f] active:scale-[0.98] transition touch-manipulation"
-          >
-            {t(language, "upload")}
-          </button>
+
+          {/* Form */}
+          <div className="space-y-5">
+            <div>
+              <label className="eyebrow block mb-1.5">
+                {t(language, "yourName")}
+              </label>
+              <input
+                type="text"
+                value={guestName}
+                onChange={(e) => setGuestName(e.target.value)}
+                placeholder={t(language, "yourName")}
+                className="input-editorial"
+              />
+            </div>
+
+            <div>
+              <label className="eyebrow block mb-1.5">
+                {t(language, "guestNoteLabel")}
+              </label>
+              <textarea
+                value={caption}
+                onChange={(e) => setCaption(e.target.value)}
+                placeholder={t(language, "captionPlaceholder")}
+                rows={3}
+                className="input-editorial !py-2 resize-none leading-relaxed"
+              />
+            </div>
+
+            <div>
+              <p className="eyebrow mb-3">{t(language, "tagsOptional")}</p>
+              <div className="flex flex-wrap gap-2">
+                {availableTags.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => toggleTag(tag)}
+                    data-active={selectedTags.includes(tag)}
+                    className="tag-chip touch-manipulation min-h-[40px]"
+                  >
+                    {tagLabel(language, tag)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-2 flex items-center justify-between gap-4 flex-wrap">
+            <span className="eyebrow">Ready when you are</span>
+            <button
+              type="button"
+              onClick={handleUpload}
+              className="btn-ink inline-flex items-center gap-3 min-h-[48px]"
+            >
+              <span>{t(language, "upload")}</span>
+              <span aria-hidden>→</span>
+            </button>
+          </div>
         </div>
       )}
 
+      {/* ── Preview overlay ── */}
       {previewFile && (
         <div
-          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]"
+          className="fixed inset-0 z-50 bg-[#17120f]/95 backdrop-blur-md flex items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] fade-in"
           onClick={() => setPreviewFile(null)}
         >
-          <button
-            className="absolute top-[max(1rem,env(safe-area-inset-top))] right-4 min-h-[48px] min-w-[48px] flex items-center justify-center text-white/80 hover:text-white text-3xl touch-manipulation"
-            onClick={() => setPreviewFile(null)}
-            aria-label="Close"
-          >
-            ×
-          </button>
+          <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-5 sm:px-8 pt-[max(1rem,env(safe-area-inset-top))] pb-4">
+            <span className="eyebrow !text-[#c79a5c]">Preview</span>
+            <button
+              onClick={() => setPreviewFile(null)}
+              className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-[#e9dfc9]/80 hover:text-white text-2xl font-light touch-manipulation"
+              aria-label="Close"
+            >
+              <span aria-hidden className="font-display">×</span>
+            </button>
+          </div>
           {previewUrl && (
             <img
               src={previewUrl}
               alt={t(language, "previewAlt")}
-              className="max-w-full max-h-[85vh] object-contain rounded-lg"
+              className="max-w-full max-h-[85vh] object-contain shadow-[0_30px_60px_-20px_rgba(0,0,0,0.6)]"
               onClick={(e) => e.stopPropagation()}
             />
           )}
         </div>
       )}
 
+      {/* ── Toast ── */}
       {toast && (
         <div
-          className={`fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] left-4 right-4 mx-auto max-w-sm py-3 px-4 rounded-xl shadow-lg text-white font-medium text-center z-50 ${
-            toast.type === 'error' ? 'bg-red-500' : 'bg-[#c9a227]'
+          className={`fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] left-4 right-4 mx-auto max-w-sm px-5 py-3 border z-50 fade-in flex items-center gap-3 ${
+            toast.type === 'error'
+              ? 'bg-[#3a1f1c] border-[#7a2f2a] text-[#f4d8d5]'
+              : 'bg-[var(--paper-card)] border-[var(--sepia)] text-[var(--ink)]'
           }`}
         >
-          {toast.message}
+          <span
+            className={`w-1.5 h-1.5 rounded-full ${
+              toast.type === 'error' ? 'bg-[#d8847a]' : 'bg-[var(--sepia)]'
+            }`}
+            aria-hidden
+          />
+          <span className="font-serif italic text-sm flex-1">{toast.message}</span>
         </div>
       )}
     </div>

@@ -37,12 +37,15 @@ const COPY = {
       title: "Curated for Quality",
       sub: "Built specifically for the high demands of luxury weddings, ensuring privacy, speed, and elegance.",
       items: [
-        { icon: "devices",           title: "No App Required",       body: "Browser-based experience works on any smartphone instantly. No friction for your guests.",                                                         wide: true },
-        { icon: "bolt",              title: "Real-time Updates",     body: "Photos appear in the gallery within seconds of being taken.",                                                                                       highlight: true },
-        { icon: "sell",              title: "Tagging & Filtering",   body: "Organize photos by moments: Ceremony, Dinner, or Party." },
-        { icon: "translate",         title: "Bilingual Support",     body: "Perfect for international weddings with EN/TC support." },
-        { icon: "admin_panel_settings", title: "Admin Deletion",    body: "Full control over your gallery. Remove unwanted photos instantly." },
-        { icon: "compress",          title: "Smart Auto Compression", body: "High-quality visuals that load instantly on any connection speed without eating up guest data.", fullWidth: true },
+        { icon: "devices",              title: "No App Required",        body: "Browser-based experience works on any smartphone instantly. No friction for your guests.", wide: true },
+        { icon: "bolt",                 title: "Real-time Updates",      body: "Photos appear in the gallery within seconds of being taken.", highlight: true },
+        { icon: "sell",                 title: "Tagging & Filtering",    body: "Organise photos by moments: Ceremony, Reception, First Dance, and more." },
+        { icon: "translate",            title: "Bilingual Support",      body: "Full English and Traditional Chinese support — perfect for multicultural weddings." },
+        { icon: "admin_panel_settings", title: "Admin Deletion",         body: "Full control over your gallery. Remove unwanted photos instantly." },
+        { icon: "edit_note",            title: "Guest Message Notes",    body: "Guests can leave a heartfelt note alongside their upload — memories beyond the photo." },
+        { icon: "qr_code_2",            title: "Branded QR Code",        body: "Your own custom QR code to print on invitations, table cards, or venue displays." },
+        { icon: "slideshow",            title: "Live Slideshow",         body: "Display a real-time slideshow at your reception as photos roll in from every guest." },
+        { icon: "compress",             title: "Smart Auto Compression", body: "High-quality visuals that load instantly on any connection speed without eating up guest data.", fullWidth: true },
       ],
     },
     pricing: {
@@ -146,12 +149,15 @@ const COPY = {
       title: "典藏品質",
       sub: "專為豪華婚禮的高要求而設計，確保私密、快速與優雅。",
       items: [
-        { icon: "devices",              title: "無需下載 App",  body: "瀏覽器即用體驗，適用於任何智能手機。賓客零障礙使用。",                       wide: true },
-        { icon: "bolt",                 title: "即時更新",     body: "照片在拍攝後數秒內即顯示於相簿中。",                                         highlight: true },
-        { icon: "sell",                 title: "標籤與篩選",   body: "按時刻分類：儀式、晚宴或派對。" },
-        { icon: "translate",            title: "雙語支援",     body: "完美支援 EN/TC，適合國際婚禮。" },
-        { icon: "admin_panel_settings", title: "管理員刪除",   body: "完全掌控你的相簿。即時移除不想要的照片。" },
-        { icon: "compress",             title: "智能自動壓縮", body: "高質素影像在任何網速下即時載入，不耗盡賓客數據。",                           fullWidth: true },
+        { icon: "devices",              title: "無需下載 App",    body: "瀏覽器即用體驗，適用於任何智能手機。賓客零障礙使用。",                                     wide: true },
+        { icon: "bolt",                 title: "即時更新",       body: "照片在拍攝後數秒內即顯示於相簿中。",                                                           highlight: true },
+        { icon: "sell",                 title: "標籤與篩選",     body: "按時刻分類：儀式、宴會、第一支舞等。" },
+        { icon: "translate",            title: "雙語支援",       body: "完整英文及繁體中文支援，適合多元文化婚禮。" },
+        { icon: "admin_panel_settings", title: "管理員刪除",     body: "完全掌控你的相簿。即時移除不想要的照片。" },
+        { icon: "edit_note",            title: "賓客留言備注",   body: "賓客可在上傳照片時附上暖心留言，讓回憶更立體。" },
+        { icon: "qr_code_2",            title: "品牌專屬二維碼", body: "你的專屬二維碼，可印在請柬、座位卡或場地展示板上。" },
+        { icon: "slideshow",            title: "即時幻燈片",     body: "宴會上即時播放幻燈片，讓所有人分享每一個精彩時刻。" },
+        { icon: "compress",             title: "智能自動壓縮",   body: "高質素影像在任何網速下即時載入，不耗盡賓客數據。",                                             fullWidth: true },
       ],
     },
     pricing: {
@@ -389,19 +395,10 @@ export default function MarketingLandingPage({ language, setLanguage }) {
             {copy.features.items.map((item, i) => {
               if (item.fullWidth) {
                 return (
-                  <div key={i} className="md:col-span-3 bg-[#f6f3f2] rounded-xl p-8 flex flex-col md:flex-row items-center gap-8">
-                    <div className="flex-1">
-                      <Icon name={item.icon} className="text-[#775a19] text-4xl mb-6 block" />
-                      <h4 className="font-headline text-2xl font-semibold mb-2">{item.title}</h4>
-                      <p className="text-[#4d4635]">{item.body}</p>
-                    </div>
-                    <div className="w-full md:w-1/2 h-48 rounded-lg overflow-hidden bg-[#e4e2e1]">
-                      <img
-                        src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=600&q=80"
-                        alt="Photography"
-                        className="w-full h-full object-cover grayscale"
-                      />
-                    </div>
+                  <div key={i} className="md:col-span-3 bg-[#f6f3f2] rounded-xl p-8">
+                    <Icon name={item.icon} className="text-[#775a19] text-4xl mb-6 block" />
+                    <h4 className="font-headline text-2xl font-semibold mb-2">{item.title}</h4>
+                    <p className="text-[#4d4635] max-w-2xl">{item.body}</p>
                   </div>
                 );
               }
