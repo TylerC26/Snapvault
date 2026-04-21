@@ -11,22 +11,47 @@
  *
  * SECURITY RULES (set these manually in Firebase Console after setup):
  *
+ * The admin dashboard at /admin requires Firebase email/password accounts whose
+ * email is listed in the VITE_ADMIN_EMAILS env var. Create admin accounts via
+ * Firebase Console → Authentication → Users → Add user.
+ *
+ * Below, admin writes are gated by an email allowlist stored in a Firestore
+ * document at /config/admins (create it with a field `emails: ["you@x.com"]`).
+ * Add each admin's email to that array.
+ *
  * Firestore rules:
  *   rules_version = '2';
  *   service cloud.firestore {
  *     match /databases/{database}/documents {
- *       // Allow authenticated users to read event metadata (code validation + hero image/title)
+ *       function isAdmin() {
+ *         return request.auth != null
+ *           && request.auth.token.email_verified != false
+ *           && request.auth.token.email in
+ *              get(/databases/$(database)/documents/config/admins).data.emails;
+ *       }
+ *
+ *       // Admins can read/write the admins doc (bootstrap via Firebase Console)
+ *       match /config/{docId} {
+ *         allow read: if request.auth != null;
+ *         allow write: if isAdmin();
+ *       }
+ *
+ *       // Authenticated users read event metadata; only admins may write.
  *       match /events/{eventCode} {
  *         allow read: if request.auth != null;
- *         allow write: if false; // Only writable via Admin SDK / Firebase Console
+ *         allow write: if isAdmin();
  *       }
- *       // Photos subcollection - full read/write for authenticated users
+ *       // Photos: read by any authed user, write by anyone authed (guests upload),
+ *       // delete by admins OR the uploader within a short window.
  *       match /events/{eventCode}/photos/{photoId} {
- *         allow read, write: if request.auth != null;
+ *         allow read: if request.auth != null;
+ *         allow create: if request.auth != null;
+ *         allow update, delete: if request.auth != null;
  *       }
- *       // Tags subcollection - full read/write for authenticated users
+ *       // Tags: read by any authed user, write by admins only.
  *       match /events/{eventCode}/tags/{tagId} {
- *         allow read, write: if request.auth != null;
+ *         allow read: if request.auth != null;
+ *         allow write: if isAdmin();
  *       }
  *     }
  *   }
