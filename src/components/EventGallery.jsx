@@ -234,7 +234,7 @@ export default function EventGallery({ language, setLanguage }) {
         {showLanding && (
           <section className="w-full max-w-md mx-auto text-center">
             <p className="eyebrow eyebrow-accent rise rise-1">
-              You are cordially invited
+              {t(language, "cordiallyInvited")}
             </p>
             <h2 className="rise rise-2 font-display italic text-4xl sm:text-5xl text-[var(--ink)] mt-4 leading-[1.05]">
               {navTitle}
@@ -264,16 +264,16 @@ export default function EventGallery({ language, setLanguage }) {
                 </div>
                 {/* caption plate */}
                 <div className="pt-4 pb-3 px-1">
-                  <div className="eyebrow">The Ceremony · Plate I</div>
+                  <div className="eyebrow">{t(language, "ceremonyPlateCaption")}</div>
                   <div className="font-display italic text-[var(--ink)] mt-1 text-lg">
-                    Enter the gallery
+                    {t(language, "enterGalleryCaption")}
                   </div>
                 </div>
               </div>
             </button>
 
             <p className="mt-8 text-xs text-[var(--ink-mute)] font-serif italic rise rise-5">
-              Tap the plate to open
+              {t(language, "tapThePlate")}
             </p>
           </section>
         )}
@@ -286,7 +286,7 @@ export default function EventGallery({ language, setLanguage }) {
                 <div>
                   <p className="eyebrow eyebrow-accent">§ I</p>
                   <h2 className="font-display italic text-3xl sm:text-4xl text-[var(--ink)] mt-1">
-                    Contribute a memory
+                    {t(language, "sectionContribute")}
                   </h2>
                 </div>
                 <span className="hidden sm:block flex-1 h-px bg-[var(--rule)] mb-2" />
@@ -295,8 +295,7 @@ export default function EventGallery({ language, setLanguage }) {
                 </span>
               </div>
               <p className="font-serif text-[var(--ink-soft)] mt-3 max-w-prose leading-relaxed">
-                Each photograph becomes part of this evening's record. Add a note, a tag,
-                and a name — or simply upload and let the moment speak.
+                {t(language, "sectionContributeLede")}
               </p>
             </div>
 
@@ -310,7 +309,7 @@ export default function EventGallery({ language, setLanguage }) {
                 <div>
                   <p className="eyebrow eyebrow-accent">§ II</p>
                   <h2 className="font-display italic text-3xl sm:text-4xl text-[var(--ink)] mt-1">
-                    The plates
+                    {t(language, "sectionPlates")}
                   </h2>
                 </div>
                 <span className="hidden sm:block flex-1 h-px bg-[var(--rule)] mb-2" />
@@ -360,7 +359,7 @@ export default function EventGallery({ language, setLanguage }) {
 
             {error && (
               <div className="mb-8 border-l-2 border-[var(--sepia)] bg-[var(--sepia-soft)] px-4 py-3">
-                <p className="eyebrow eyebrow-accent mb-1">Notice</p>
+                <p className="eyebrow eyebrow-accent mb-1">{t(language, "noticeLabel")}</p>
                 <p className="font-serif italic text-sm text-[var(--sepia-deep)]">{error}</p>
               </div>
             )}
@@ -376,9 +375,9 @@ export default function EventGallery({ language, setLanguage }) {
 
             {/* Colophon */}
             <div className="mt-24 pt-8 border-t border-[var(--rule)] text-center">
-              <p className="eyebrow">Colophon</p>
-              <p className="font-display italic text-[var(--ink-soft)] mt-2">
-                Set in Cormorant &amp; Noto Serif · Printed as it happens
+              <p className="eyebrow">{t(language, "colophonLabel")}</p>
+              <p className="font-display italic text-[var(--ink-soft)] mt-2 px-4">
+                {t(language, "colophonLine")}
               </p>
             </div>
           </div>

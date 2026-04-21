@@ -173,6 +173,9 @@
 
 /* ── Primary CTA — sepia ink block, letterpress feel ── */
 .btn-ink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-family: 'Source Sans 3', system-ui, sans-serif;
   font-weight: 600;
   letter-spacing: 0.18em;
@@ -182,6 +185,8 @@
   color: var(--paper);
   border: 1px solid var(--ink);
   padding: 1rem 1.75rem;
+  min-height: 48px;
+  touch-action: manipulation;
   transition: background 200ms ease, color 200ms ease, transform 120ms ease;
 }
 .btn-ink:hover { background: var(--sepia-deep); border-color: var(--sepia-deep); }
@@ -189,6 +194,9 @@
 .btn-ink:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-family: 'Source Sans 3', system-ui, sans-serif;
   font-weight: 600;
   letter-spacing: 0.18em;
@@ -198,6 +206,8 @@
   color: var(--ink);
   border: 1px solid var(--rule-strong);
   padding: 0.85rem 1.4rem;
+  min-height: 48px;
+  touch-action: manipulation;
   transition: border-color 200ms ease, color 200ms ease;
 }
 .btn-ghost:hover { border-color: var(--sepia); color: var(--sepia); }

@@ -285,7 +285,7 @@ export default function PhotoUpload({ eventCode, language, availableTags }) {
         <div className="bg-[var(--paper-card)] border border-[var(--rule)] p-5 sm:p-7 space-y-6">
           <div className="flex items-baseline justify-between gap-3">
             <div>
-              <p className="eyebrow eyebrow-accent">Review</p>
+              <p className="eyebrow eyebrow-accent">{t(language, "reviewLabel")}</p>
               <p className="font-display italic text-xl text-[var(--ink)] mt-0.5">
                 {pendingFiles.length}{" "}
                 <span className="text-[var(--ink-mute)]">
@@ -386,11 +386,11 @@ export default function PhotoUpload({ eventCode, language, availableTags }) {
           </div>
 
           <div className="pt-2 flex items-center justify-between gap-4 flex-wrap">
-            <span className="eyebrow">Ready when you are</span>
+            <span className="eyebrow">{t(language, "readyWhenYouAre")}</span>
             <button
               type="button"
               onClick={handleUpload}
-              className="btn-ink inline-flex items-center gap-3 min-h-[48px]"
+              className="btn-ink inline-flex items-center gap-3 min-h-[48px] w-full sm:w-auto justify-center"
             >
               <span>{t(language, "upload")}</span>
               <span aria-hidden>→</span>
@@ -406,11 +406,11 @@ export default function PhotoUpload({ eventCode, language, availableTags }) {
           onClick={() => setPreviewFile(null)}
         >
           <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-5 sm:px-8 pt-[max(1rem,env(safe-area-inset-top))] pb-4">
-            <span className="eyebrow !text-[#c79a5c]">Preview</span>
+            <span className="eyebrow !text-[#c79a5c]">{t(language, "previewLabel")}</span>
             <button
               onClick={() => setPreviewFile(null)}
               className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-[#e9dfc9]/80 hover:text-white text-2xl font-light touch-manipulation"
-              aria-label="Close"
+              aria-label={t(language, "close")}
             >
               <span aria-hidden className="font-display">×</span>
             </button>

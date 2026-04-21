@@ -43,7 +43,7 @@ export default function EventCodeEntry({ language, setLanguage }) {
       {/* Top meta bar — broadsheet masthead */}
       <div className="relative z-10 max-w-6xl mx-auto px-6 sm:px-10 pt-[max(1.25rem,env(safe-area-inset-top))]">
         <div className="flex items-center justify-between py-5 border-b border-[var(--rule)]">
-          <span className="eyebrow eyebrow-accent">Vol. I — The Archive</span>
+          <span className="eyebrow eyebrow-accent">{t(language, "mastheadVolume")}</span>
           <span className="hidden sm:block font-display italic text-lg text-[var(--ink)]">
             SnapVault
           </span>
@@ -74,12 +74,12 @@ export default function EventCodeEntry({ language, setLanguage }) {
       {/* Central composition */}
       <main className="relative z-10 max-w-6xl mx-auto px-6 sm:px-10 flex flex-col items-center justify-center min-h-[calc(100svh-6rem)] pb-[max(2.5rem,env(safe-area-inset-bottom))]">
         <div className="w-full max-w-xl text-center">
-          <p className="eyebrow rise rise-1">— Est. for the happy few —</p>
+          <p className="eyebrow rise rise-1">— {t(language, "mastheadTagline")} —</p>
 
-          <h1 className="rise rise-2 font-display text-[15vw] sm:text-7xl md:text-8xl font-medium text-[var(--ink)] leading-[0.95] mt-8">
-            <span className="italic">Enter</span>
+          <h1 className="rise rise-2 font-display text-[13vw] sm:text-7xl md:text-8xl font-medium text-[var(--ink)] leading-[0.95] mt-6 sm:mt-8">
+            <span className="italic">{t(language, "enterHeadline1")}</span>
             <br />
-            <span className="tracking-tight">the gallery</span>
+            <span className="tracking-tight">{t(language, "enterHeadline2")}</span>
           </h1>
 
           <div className="flex items-center justify-center gap-4 mt-8 rise rise-3">
@@ -156,7 +156,7 @@ export default function EventCodeEntry({ language, setLanguage }) {
             <div className="flex items-center justify-center gap-3 text-[var(--ink-mute)]">
               <span className="w-px h-3 bg-[var(--rule-strong)]" />
               <span className="font-display italic text-sm">
-                {t(language, "appTitle")} — a keepsake of candid light
+                {t(language, "appTitle")} — {t(language, "keepsakeTagline")}
               </span>
               <span className="w-px h-3 bg-[var(--rule-strong)]" />
             </div>

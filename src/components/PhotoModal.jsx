@@ -84,7 +84,7 @@ export default function PhotoModal({ photos, currentIndex, onClose, onNavigate, 
         <button
           type="button"
           onClick={showPassword ? () => setShowPassword(false) : onClose}
-          aria-label="Close"
+          aria-label={t(language, "close")}
           className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-[#e9dfc9]/80 hover:text-white text-2xl font-light touch-manipulation transition-colors"
         >
           <span aria-hidden className="font-display">×</span>
@@ -111,7 +111,7 @@ export default function PhotoModal({ photos, currentIndex, onClose, onNavigate, 
           <button
             type="button"
             onClick={goPrev}
-            aria-label="Previous photo"
+            aria-label={t(language, "previousPhoto")}
             className="group absolute left-2 sm:left-8 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 text-[#e9dfc9]/70 hover:text-[#c79a5c] transition-colors touch-manipulation p-2"
           >
             <span aria-hidden className="font-display text-3xl leading-none">‹</span>
@@ -131,7 +131,7 @@ export default function PhotoModal({ photos, currentIndex, onClose, onNavigate, 
           <button
             type="button"
             onClick={goNext}
-            aria-label="Next photo"
+            aria-label={t(language, "nextPhoto")}
             className="group absolute right-2 sm:right-8 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 text-[#e9dfc9]/70 hover:text-[#c79a5c] transition-colors touch-manipulation p-2"
           >
             <span aria-hidden className="font-display text-3xl leading-none">›</span>
@@ -205,7 +205,7 @@ export default function PhotoModal({ photos, currentIndex, onClose, onNavigate, 
             className="bg-[var(--paper-card)] max-w-sm w-full shadow-2xl border border-[var(--rule)] p-7"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="eyebrow eyebrow-accent mb-2">Confirm deletion</p>
+            <p className="eyebrow eyebrow-accent mb-2">{t(language, "confirmDeletion")}</p>
             <p className="font-display italic text-xl text-[var(--ink)] mb-4">
               {t(language, "enterPasswordToDelete")}
             </p>
