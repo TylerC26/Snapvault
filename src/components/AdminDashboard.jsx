@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   collection,
@@ -13,9 +13,13 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase";
 import AdminShell from "./AdminShell";
-
-const DEFAULT_HERO =
-  "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1400&q=80";
+import { uploadHeroImage, deleteHeroImage } from "../utils/heroImage";
+import {
+  daysUntilExpiry,
+  formatExpiryDate,
+  isExpired,
+  isExpiringToday,
+} from "../utils/expiry";
 
 function formatDate(iso) {
   if (!iso) return "—";
@@ -34,8 +38,45 @@ function CreateEventForm({ onCreate, busy }) {
   const [open, setOpen] = useState(false);
   const [code, setCode] = useState("");
   const [title, setTitle] = useState("");
-  const [heroImage, setHeroImage] = useState("");
+  const [expiresAt, setExpiresAt] = useState("");
+  const [heroFile, setHeroFile] = useState(null);
   const [error, setError] = useState("");
+  const fileInputRef = useRef(null);
+
+  const heroPreview = useMemo(
+    () => (heroFile ? URL.createObjectURL(heroFile) : null),
+    [heroFile]
+  );
+
+  useEffect(() => {
+    if (!heroPreview) return;
+    return () => URL.revokeObjectURL(heroPreview);
+  }, [heroPreview]);
+
+  const reset = () => {
+    setCode("");
+    setTitle("");
+    setExpiresAt("");
+    setHeroFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleFilePick = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!/^image\/(jpeg|jpg|png|webp|gif)$/i.test(file.type)) {
+      setError("Hero image must be a JPG, PNG, WebP, or GIF.");
+      e.target.value = "";
+      return;
+    }
+    setError("");
+    setHeroFile(file);
+  };
+
+  const clearHeroFile = () => {
+    setHeroFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -54,11 +95,10 @@ function CreateEventForm({ onCreate, busy }) {
       await onCreate({
         code: trimmedCode,
         title: trimmedTitle,
-        heroImage: heroImage.trim() || DEFAULT_HERO,
+        expiresAt: expiresAt || null,
+        heroFile,
       });
-      setCode("");
-      setTitle("");
-      setHeroImage("");
+      reset();
       setOpen(false);
     } catch (err) {
       setError(err?.message || "Failed to create event.");
@@ -89,6 +129,7 @@ function CreateEventForm({ onCreate, busy }) {
           onClick={() => {
             setOpen(false);
             setError("");
+            reset();
           }}
           className="eyebrow hover:text-[var(--ink)]"
         >
@@ -117,14 +158,59 @@ function CreateEventForm({ onCreate, busy }) {
         className="w-full font-serif text-base py-2 bg-transparent border-0 border-b border-[var(--rule-strong)] focus:border-[var(--sepia)] focus:outline-none text-[var(--ink)] mb-5"
       />
 
-      <label className="block eyebrow mb-2">Hero image URL <span className="text-[var(--ink-mute)] normal-case tracking-normal">(optional)</span></label>
+      <label className="block eyebrow mb-2">
+        Expires on <span className="text-[var(--ink-mute)] normal-case tracking-normal">(optional)</span>
+      </label>
       <input
-        type="text"
-        value={heroImage}
-        onChange={(e) => setHeroImage(e.target.value)}
-        placeholder="https://…"
-        className="w-full font-serif text-sm py-2 bg-transparent border-0 border-b border-[var(--rule-strong)] focus:border-[var(--sepia)] focus:outline-none text-[var(--ink)] mb-4"
+        type="date"
+        value={expiresAt}
+        onChange={(e) => setExpiresAt(e.target.value)}
+        className="w-full font-serif text-base py-2 bg-transparent border-0 border-b border-[var(--rule-strong)] focus:border-[var(--sepia)] focus:outline-none text-[var(--ink)] mb-1"
       />
+      <p className="font-serif italic text-xs text-[var(--ink-mute)] mb-5">
+        After this date you'll be prompted to pause uploads.
+      </p>
+
+      <label className="block eyebrow mb-2">
+        Hero image <span className="text-[var(--ink-mute)] normal-case tracking-normal">(optional)</span>
+      </label>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+        className="hidden"
+        onChange={handleFilePick}
+      />
+      <div className="flex items-start gap-4 mb-4">
+        <div className="shrink-0 w-20 aspect-[3/4] bg-[var(--paper-deep)] border border-[var(--rule)] overflow-hidden">
+          {heroPreview && (
+            <img src={heroPreview} alt="" className="w-full h-full object-cover" />
+          )}
+        </div>
+        <div className="flex flex-col gap-2">
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="min-h-[36px] px-3 font-serif italic text-sm border border-[var(--rule-strong)] text-[var(--ink-soft)] hover:border-[var(--sepia)] hover:text-[var(--sepia)] transition-colors"
+          >
+            {heroFile ? "Choose a different file" : "Choose file…"}
+          </button>
+          {heroFile && (
+            <div className="flex items-center gap-3">
+              <span className="font-serif italic text-xs text-[var(--ink-mute)] truncate max-w-[12rem]">
+                {heroFile.name}
+              </span>
+              <button
+                type="button"
+                onClick={clearHeroFile}
+                className="eyebrow hover:text-[var(--sepia)]"
+              >
+                Remove
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
 
       {error && (
         <p className="font-serif italic text-sm text-[var(--sepia-deep)] mb-3">
@@ -175,6 +261,30 @@ function EventRow({ event }) {
     }
   };
 
+  const expired = isExpired(event.expiresAt);
+  const expiringToday = isExpiringToday(event.expiresAt);
+  const daysLeft = daysUntilExpiry(event.expiresAt);
+  const expiringSoon =
+    !expired && !expiringToday && daysLeft !== null && daysLeft <= 7;
+  const needsPauseNotice = expired && event.active;
+
+  let expiryLabel = null;
+  let expiryClass = "text-[var(--ink-mute)]";
+  if (event.expiresAt) {
+    if (expired) {
+      expiryLabel = `Expired ${formatExpiryDate(event.expiresAt)}`;
+      expiryClass = "text-[var(--sepia-deep)]";
+    } else if (expiringToday) {
+      expiryLabel = `Expires today (${formatExpiryDate(event.expiresAt)})`;
+      expiryClass = "text-[var(--sepia)]";
+    } else if (expiringSoon) {
+      expiryLabel = `Expires in ${daysLeft} day${daysLeft === 1 ? "" : "s"}`;
+      expiryClass = "text-[var(--sepia)]";
+    } else {
+      expiryLabel = `Expires ${formatExpiryDate(event.expiresAt)}`;
+    }
+  }
+
   return (
     <article className="border-b border-[var(--rule)] py-5 sm:py-6 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
       <div className="shrink-0 w-full sm:w-28 aspect-[3/4] bg-[var(--paper-deep)] overflow-hidden">
@@ -199,6 +309,9 @@ function EventRow({ event }) {
           >
             {event.active ? "Active" : "Paused"}
           </span>
+          {expiryLabel && (
+            <span className={"eyebrow " + expiryClass}>{expiryLabel}</span>
+          )}
         </div>
         <h3 className="font-display italic text-2xl sm:text-3xl text-[var(--ink)] leading-tight mt-1 truncate">
           {event.title || "Untitled"}
@@ -208,6 +321,22 @@ function EventRow({ event }) {
           <span className="mx-2 text-[var(--ink-mute)]">·</span>
           Created {formatDate(event.createdAt)}
         </p>
+        {needsPauseNotice && (
+          <div className="mt-3 flex items-center gap-3 flex-wrap border-l-2 border-[var(--sepia)] bg-[var(--sepia-soft)] px-3 py-2">
+            <p className="font-serif italic text-sm text-[var(--sepia-deep)] flex-1 min-w-[12rem]">
+              This event expired on {formatExpiryDate(event.expiresAt)}. Pause
+              it to stop further uploads.
+            </p>
+            <button
+              type="button"
+              onClick={handleToggle}
+              disabled={toggling}
+              className="min-h-[36px] px-3 font-serif italic text-sm bg-[var(--sepia-deep)] text-[var(--paper)] hover:bg-[var(--ink)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              {toggling ? "…" : "Pause now"}
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -260,20 +389,36 @@ function DashboardContent({ user, signOut }) {
     return () => unsub();
   }, []);
 
-  const handleCreate = async ({ code, title, heroImage }) => {
+  const handleCreate = async ({ code, title, expiresAt, heroFile }) => {
     setCreateBusy(true);
     try {
       if (events.some((e) => e.code === code)) {
         throw new Error("An event with that code already exists.");
       }
-      await setDoc(doc(db, "events", code), {
-        title,
-        heroImage,
-        active: true,
-        createdAt: new Date().toISOString(),
-        createdBy: user.email,
-        updatedAt: serverTimestamp(),
-      });
+
+      let heroImage = "";
+      let heroStoragePath = null;
+      if (heroFile) {
+        const uploaded = await uploadHeroImage(code, heroFile);
+        heroImage = uploaded.url;
+        heroStoragePath = uploaded.storagePath;
+      }
+
+      try {
+        await setDoc(doc(db, "events", code), {
+          title,
+          heroImage,
+          heroStoragePath,
+          expiresAt: expiresAt || null,
+          active: true,
+          createdAt: new Date().toISOString(),
+          createdBy: user.email,
+          updatedAt: serverTimestamp(),
+        });
+      } catch (err) {
+        if (heroStoragePath) await deleteHeroImage(heroStoragePath).catch(() => {});
+        throw err;
+      }
     } finally {
       setCreateBusy(false);
     }
@@ -290,6 +435,18 @@ function DashboardContent({ user, signOut }) {
   }, [events, search]);
 
   const activeCount = events.filter((e) => e.active).length;
+  const expiredActive = events.filter(
+    (e) => e.active && isExpired(e.expiresAt)
+  );
+
+  const handlePauseExpired = async (code) => {
+    try {
+      await updateDoc(doc(db, "events", code), { active: false });
+    } catch (err) {
+      console.error(err);
+      alert("Failed to pause event.");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[var(--paper)] paper-grain">
@@ -320,6 +477,39 @@ function DashboardContent({ user, signOut }) {
       </header>
 
       <main className="max-w-6xl mx-auto px-5 sm:px-8 py-8 sm:py-12">
+        {expiredActive.length > 0 && (
+          <section className="mb-8 border-l-2 border-[var(--sepia)] bg-[var(--sepia-soft)] px-4 py-4">
+            <p className="eyebrow eyebrow-accent mb-1">Action required</p>
+            <p className="font-serif italic text-sm text-[var(--sepia-deep)] mb-3">
+              {expiredActive.length === 1
+                ? "1 active event has passed its expiration date — pause it to stop further uploads."
+                : `${expiredActive.length} active events have passed their expiration dates — pause them to stop further uploads.`}
+            </p>
+            <ul className="flex flex-col gap-2">
+              {expiredActive.map((e) => (
+                <li
+                  key={e.code}
+                  className="flex items-center justify-between gap-3 flex-wrap"
+                >
+                  <span className="font-serif text-sm text-[var(--ink)]">
+                    <span className="eyebrow eyebrow-accent mr-2">№ {e.code}</span>
+                    {e.title || "Untitled"}
+                    <span className="mx-2 text-[var(--ink-mute)]">·</span>
+                    Expired {formatExpiryDate(e.expiresAt)}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handlePauseExpired(e.code)}
+                    className="min-h-[36px] px-3 font-serif italic text-sm bg-[var(--sepia-deep)] text-[var(--paper)] hover:bg-[var(--ink)] transition-colors"
+                  >
+                    Pause now
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
         {/* Stats strip */}
         <section className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-8 mb-10 pb-8 border-b border-[var(--rule)]">
           <div>

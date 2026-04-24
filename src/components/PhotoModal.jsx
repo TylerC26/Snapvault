@@ -81,16 +81,6 @@ export default function PhotoModal({ photos, currentIndex, onClose, onNavigate, 
         </span>
       </div>
 
-      {/* Close button — top right */}
-      <button
-        type="button"
-        aria-label={t(language, "close")}
-        className="absolute top-[max(0.75rem,env(safe-area-inset-top))] right-4 sm:right-6 z-30 h-11 w-11 inline-flex items-center justify-center rounded-full bg-white/10 border border-white/30 text-white hover:bg-white/20 hover:border-white/60 text-2xl leading-none touch-manipulation transition-colors"
-        onClick={(e) => { e.stopPropagation(); showPassword ? setShowPassword(false) : onClose(); }}
-      >
-        ✕
-      </button>
-
       <div
         className="absolute inset-0 flex flex-col items-center justify-center px-4 pt-16 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
         onClick={!showPassword ? onClose : undefined}
@@ -110,7 +100,7 @@ export default function PhotoModal({ photos, currentIndex, onClose, onNavigate, 
         {hasMultiple && (
           <button
             type="button"
-            onClick={goPrev}
+            onClick={(e) => { e.stopPropagation(); goPrev(); }}
             aria-label={t(language, "previousPhoto")}
             className="group absolute left-2 sm:left-8 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 text-[#e9dfc9]/70 hover:text-[#c79a5c] transition-colors touch-manipulation p-2"
           >
@@ -130,7 +120,7 @@ export default function PhotoModal({ photos, currentIndex, onClose, onNavigate, 
         {hasMultiple && (
           <button
             type="button"
-            onClick={goNext}
+            onClick={(e) => { e.stopPropagation(); goNext(); }}
             aria-label={t(language, "nextPhoto")}
             className="group absolute right-2 sm:right-8 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 text-[#e9dfc9]/70 hover:text-[#c79a5c] transition-colors touch-manipulation p-2"
           >
@@ -183,16 +173,25 @@ export default function PhotoModal({ photos, currentIndex, onClose, onNavigate, 
             </p>
           )}
 
-          {onDelete && (
+          <div className="mt-5 flex items-center justify-center gap-6">
             <button
               type="button"
-              onClick={handleDeleteClick}
-              className="mt-5 inline-flex items-center gap-2 font-sans text-[10px] tracking-[0.2em] uppercase text-[#e9dfc9]/50 hover:text-[#d8847a] border-b border-transparent hover:border-[#d8847a]/60 pb-0.5 transition-colors touch-manipulation"
+              onClick={(e) => { e.stopPropagation(); onClose(); }}
+              className="inline-flex items-center gap-2 font-sans text-[10px] tracking-[0.2em] uppercase text-[#e9dfc9]/70 hover:text-white border border-[#e9dfc9]/30 hover:border-white/60 px-4 py-2 transition-colors touch-manipulation"
             >
               <span aria-hidden>✕</span>
-              {t(language, "deletePhoto")}
+              {t(language, "close")}
             </button>
-          )}
+            {onDelete && (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); handleDeleteClick(); }}
+                className="inline-flex items-center gap-2 font-sans text-[10px] tracking-[0.2em] uppercase text-[#e9dfc9]/50 hover:text-[#d8847a] border-b border-transparent hover:border-[#d8847a]/60 pb-0.5 transition-colors touch-manipulation"
+              >
+                {t(language, "deletePhoto")}
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

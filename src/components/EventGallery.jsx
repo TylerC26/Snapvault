@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { collection, query, orderBy, onSnapshot, doc, getDoc, deleteDoc } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot, doc, deleteDoc } from "firebase/firestore";
 import { ref, deleteObject } from "firebase/storage";
 import { db, storage, signInAnon } from "../firebase";
 import PhotoUpload from "./PhotoUpload";
@@ -30,7 +30,7 @@ export default function EventGallery({ language, setLanguage }) {
   const [error, setError] = useState(null);
   const [filterTag, setFilterTag] = useState(null);
   const [showLanding, setShowLanding] = useState(true);
-  const [eventData, setEventData] = useState({ title: null, heroImage: null });
+  const [eventData, setEventData] = useState({ title: null, heroImage: null, active: true });
 
   const availableTags = useMemo(() => {
     const seen = new Set();
@@ -165,22 +165,37 @@ export default function EventGallery({ language, setLanguage }) {
     setFilterTag(null);
   }, [code]);
 
-  // Fetch event metadata (title, heroImage) from Firestore
+  // Subscribe to event metadata (title, heroImage, active) so admin changes
+  // (e.g. pausing the event) propagate live without requiring a reload.
   useEffect(() => {
     if (!code) return;
     const displayCode = code.toUpperCase();
+    let cancelled = false;
+    let unsubscribe = () => {};
+
     signInAnon()
-      .then(() => getDoc(doc(db, "events", displayCode)))
-      .then((snap) => {
-        if (snap.exists()) {
-          const data = snap.data();
-          setEventData({
-            title: data.title || null,
-            heroImage: data.heroImage || null,
-          });
-        }
+      .then(() => {
+        if (cancelled) return;
+        unsubscribe = onSnapshot(
+          doc(db, "events", displayCode),
+          (snap) => {
+            if (cancelled || !snap.exists()) return;
+            const data = snap.data();
+            setEventData({
+              title: data.title || null,
+              heroImage: data.heroImage || null,
+              active: data.active !== false,
+            });
+          },
+          (err) => console.error("Failed to load event metadata:", err)
+        );
       })
       .catch((err) => console.error("Failed to load event metadata:", err));
+
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
   }, [code]);
 
   if (!code) return null;
@@ -286,7 +301,9 @@ export default function EventGallery({ language, setLanguage }) {
                 <div>
                   <p className="eyebrow eyebrow-accent">§ I</p>
                   <h2 className="font-display italic text-3xl sm:text-4xl text-[var(--ink)] mt-1">
-                    {t(language, "sectionContribute")}
+                    {eventData.active
+                      ? t(language, "sectionContribute")
+                      : t(language, "uploadsPaused")}
                   </h2>
                 </div>
                 <span className="hidden sm:block flex-1 h-px bg-[var(--rule)] mb-2" />
@@ -295,13 +312,24 @@ export default function EventGallery({ language, setLanguage }) {
                 </span>
               </div>
               <p className="font-serif text-[var(--ink-soft)] mt-3 max-w-prose leading-relaxed">
-                {t(language, "sectionContributeLede")}
+                {eventData.active
+                  ? t(language, "sectionContributeLede")
+                  : t(language, "uploadsPausedLede")}
               </p>
             </div>
 
-            <div className="mb-14">
-              <PhotoUpload eventCode={displayCode} language={language} availableTags={availableTags} />
-            </div>
+            {eventData.active ? (
+              <div className="mb-14">
+                <PhotoUpload eventCode={displayCode} language={language} availableTags={availableTags} />
+              </div>
+            ) : (
+              <div className="mb-14 border-l-2 border-[var(--sepia)] bg-[var(--sepia-soft)] px-4 py-3">
+                <p className="eyebrow eyebrow-accent mb-1">{t(language, "noticeLabel")}</p>
+                <p className="font-serif italic text-sm text-[var(--sepia-deep)]">
+                  {t(language, "uploadsPausedLede")}
+                </p>
+              </div>
+            )}
 
             {/* ── Section title: The Plates ── */}
             <div className="mb-6">

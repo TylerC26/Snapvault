@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import {
   addDoc,
@@ -19,6 +19,8 @@ import { db, storage } from "../firebase";
 import AdminShell from "./AdminShell";
 import { PHOTO_TAGS } from "../constants/tags";
 import { downloadPhotosAsZip } from "../utils/downloadPhotos";
+import { uploadHeroImage, deleteHeroImage } from "../utils/heroImage";
+import { formatExpiryDate, isExpired } from "../utils/expiry";
 
 function getStoragePathFromUrl(url) {
   try {
@@ -43,29 +45,81 @@ async function deletePhotoDoc(eventCode, photo) {
 
 function MetadataEditor({ code, eventData, onSaved }) {
   const [title, setTitle] = useState(eventData.title || "");
-  const [heroImage, setHeroImage] = useState(eventData.heroImage || "");
+  const [expiresAt, setExpiresAt] = useState(eventData.expiresAt || "");
+  const [heroFile, setHeroFile] = useState(null);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState("");
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     setTitle(eventData.title || "");
-    setHeroImage(eventData.heroImage || "");
-  }, [eventData.title, eventData.heroImage]);
+    setExpiresAt(eventData.expiresAt || "");
+    setHeroFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }, [eventData.title, eventData.heroImage, eventData.expiresAt]);
+
+  const heroFileUrl = useMemo(
+    () => (heroFile ? URL.createObjectURL(heroFile) : null),
+    [heroFile]
+  );
+
+  useEffect(() => {
+    if (!heroFileUrl) return;
+    return () => URL.revokeObjectURL(heroFileUrl);
+  }, [heroFileUrl]);
 
   const dirty =
     title !== (eventData.title || "") ||
-    heroImage !== (eventData.heroImage || "");
+    expiresAt !== (eventData.expiresAt || "") ||
+    heroFile !== null;
+  const previewSrc = heroFileUrl || eventData.heroImage || null;
+
+  const handleFilePick = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!/^image\/(jpeg|jpg|png|webp|gif)$/i.test(file.type)) {
+      setStatus("Hero image must be a JPG, PNG, WebP, or GIF.");
+      e.target.value = "";
+      return;
+    }
+    setStatus("");
+    setHeroFile(file);
+  };
+
+  const clearHeroFile = () => {
+    setHeroFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
     setStatus("");
     try {
-      await updateDoc(doc(db, "events", code), {
+      const update = {
         title: title.trim(),
-        heroImage: heroImage.trim(),
+        expiresAt: expiresAt || null,
         updatedAt: serverTimestamp(),
-      });
+      };
+
+      let oldStoragePath = null;
+      if (heroFile) {
+        const uploaded = await uploadHeroImage(code, heroFile);
+        update.heroImage = uploaded.url;
+        update.heroStoragePath = uploaded.storagePath;
+        oldStoragePath = eventData.heroStoragePath || null;
+      }
+
+      await updateDoc(doc(db, "events", code), update);
+
+      if (oldStoragePath && oldStoragePath !== update.heroStoragePath) {
+        await deleteHeroImage(oldStoragePath).catch((err) => {
+          console.warn("Failed to delete previous hero image:", err);
+        });
+      }
+
+      setHeroFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
       setStatus("Saved.");
       onSaved?.();
     } catch (err) {
@@ -87,14 +141,69 @@ function MetadataEditor({ code, eventData, onSaved }) {
           className="w-full font-display italic text-2xl py-2 bg-transparent border-0 border-b border-[var(--rule-strong)] focus:border-[var(--sepia)] focus:outline-none text-[var(--ink)] mb-6"
         />
 
-        <label className="block eyebrow mb-2">Hero image URL</label>
+        <label className="block eyebrow mb-2">
+          Expires on{" "}
+          <span className="text-[var(--ink-mute)] normal-case tracking-normal">
+            (optional)
+          </span>
+        </label>
+        <div className="flex items-center gap-3 mb-1">
+          <input
+            type="date"
+            value={expiresAt}
+            onChange={(e) => setExpiresAt(e.target.value)}
+            className="font-serif text-base py-2 bg-transparent border-0 border-b border-[var(--rule-strong)] focus:border-[var(--sepia)] focus:outline-none text-[var(--ink)]"
+          />
+          {expiresAt && (
+            <button
+              type="button"
+              onClick={() => setExpiresAt("")}
+              className="eyebrow hover:text-[var(--sepia)]"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+        <p className="font-serif italic text-xs text-[var(--ink-mute)] mb-6">
+          After this date you'll be prompted to pause uploads.
+        </p>
+
+        <label className="block eyebrow mb-2">Hero image</label>
         <input
-          type="text"
-          value={heroImage}
-          onChange={(e) => setHeroImage(e.target.value)}
-          placeholder="https://… or /local-path.png"
-          className="w-full font-serif text-sm py-2 bg-transparent border-0 border-b border-[var(--rule-strong)] focus:border-[var(--sepia)] focus:outline-none text-[var(--ink)] mb-5"
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+          className="hidden"
+          onChange={handleFilePick}
         />
+        <div className="flex flex-col gap-2 mb-5">
+          <div className="flex items-center gap-3 flex-wrap">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="min-h-[36px] px-3 font-serif italic text-sm border border-[var(--rule-strong)] text-[var(--ink-soft)] hover:border-[var(--sepia)] hover:text-[var(--sepia)] transition-colors"
+            >
+              {eventData.heroImage || heroFile ? "Replace hero image…" : "Choose file…"}
+            </button>
+            {heroFile && (
+              <>
+                <span className="font-serif italic text-xs text-[var(--ink-mute)] truncate max-w-[14rem]">
+                  {heroFile.name}
+                </span>
+                <button
+                  type="button"
+                  onClick={clearHeroFile}
+                  className="eyebrow hover:text-[var(--sepia)]"
+                >
+                  Cancel
+                </button>
+              </>
+            )}
+          </div>
+          <p className="font-serif italic text-xs text-[var(--ink-mute)]">
+            JPG, PNG, WebP, or GIF. Stored in Firebase Storage.
+          </p>
+        </div>
 
         <div className="flex items-center gap-4">
           <button
@@ -113,10 +222,10 @@ function MetadataEditor({ code, eventData, onSaved }) {
       </div>
 
       <div className="order-first lg:order-last">
-        <p className="eyebrow mb-2">Preview</p>
+        <p className="eyebrow mb-2">{heroFile ? "New preview" : "Preview"}</p>
         <div className="aspect-[3/4] bg-[var(--paper-deep)] overflow-hidden border border-[var(--rule)]">
-          {heroImage && (
-            <img src={heroImage} alt="" className="w-full h-full object-cover" />
+          {previewSrc && (
+            <img src={previewSrc} alt="" className="w-full h-full object-cover" />
           )}
         </div>
       </div>
@@ -432,7 +541,7 @@ function PhotoModeration({ code, photos }) {
   );
 }
 
-function DangerZone({ code, photos, onDeleted }) {
+function DangerZone({ code, eventData, photos, onDeleted }) {
   const [confirmText, setConfirmText] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -445,6 +554,11 @@ function DangerZone({ code, photos, onDeleted }) {
     try {
       for (const photo of photos) {
         await deletePhotoDoc(code, photo);
+      }
+      if (eventData?.heroStoragePath) {
+        await deleteHeroImage(eventData.heroStoragePath).catch((err) => {
+          console.warn("Failed to delete hero image:", err);
+        });
       }
       const tagsSnap = await getDocs(collection(db, "events", code, "tags"));
       const batch = writeBatch(db);
@@ -673,6 +787,19 @@ function EventManagerContent({ signOut }) {
             <span className="font-serif text-sm text-[var(--ink-soft)]">
               {customTags.length} custom tag{customTags.length === 1 ? "" : "s"}
             </span>
+            {eventData.expiresAt && (
+              <span
+                className={
+                  "font-serif text-sm " +
+                  (isExpired(eventData.expiresAt)
+                    ? "text-[var(--sepia-deep)]"
+                    : "text-[var(--ink-soft)]")
+                }
+              >
+                {isExpired(eventData.expiresAt) ? "Expired " : "Expires "}
+                {formatExpiryDate(eventData.expiresAt)}
+              </span>
+            )}
           </div>
           <button
             type="button"
@@ -683,6 +810,27 @@ function EventManagerContent({ signOut }) {
             {toggling ? "…" : eventData.active ? "Pause event" : "Activate event"}
           </button>
         </section>
+
+        {isExpired(eventData.expiresAt) && eventData.active && (
+          <section className="mb-8 border-l-2 border-[var(--sepia)] bg-[var(--sepia-soft)] px-4 py-4 flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex-1 min-w-[16rem]">
+              <p className="eyebrow eyebrow-accent mb-1">Action required</p>
+              <p className="font-serif italic text-sm text-[var(--sepia-deep)]">
+                This event expired on {formatExpiryDate(eventData.expiresAt)}.
+                Pause it to stop further guest uploads — the gallery will remain
+                viewable.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleToggleActive}
+              disabled={toggling}
+              className="min-h-[40px] px-4 font-serif italic text-sm bg-[var(--sepia-deep)] text-[var(--paper)] hover:bg-[var(--ink)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              {toggling ? "…" : "Pause now"}
+            </button>
+          </section>
+        )}
 
         {/* Tabs */}
         <nav className="mb-8 border-b border-[var(--rule)] flex gap-1 overflow-x-auto scrollbar-hide">
@@ -757,6 +905,7 @@ function EventManagerContent({ signOut }) {
             </div>
             <DangerZone
               code={code}
+              eventData={eventData}
               photos={photos}
               onDeleted={() => navigate("/admin")}
             />

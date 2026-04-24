@@ -121,6 +121,9 @@ export const TEXT = {
     sectionContribute: "Contribute a memory",
     sectionContributeLede:
       "Each photograph becomes part of this evening's record. Add a note, a tag, and a name — or simply upload and let the moment speak.",
+    uploadsPaused: "Uploads are paused",
+    uploadsPausedLede:
+      "The host has paused new contributions for this event. The gallery below remains open for viewing.",
     sectionPlates: "The plates",
     // Upload UI
     reviewLabel: "Review",
@@ -224,6 +227,9 @@ export const TEXT = {
     sectionContribute: "題一幀回憶",
     sectionContributeLede:
       "每一幀照片，皆為今夕典禮之紀錄。可附以題記、標籤、名氏——或徑自上傳，讓畫面自道其意。",
+    uploadsPaused: "暫停收稿",
+    uploadsPausedLede:
+      "主家已暫停本次活動之新稿。下方典藏版面仍可翻閱。",
     sectionPlates: "典藏版面",
     // Upload UI
     reviewLabel: "校覽",
